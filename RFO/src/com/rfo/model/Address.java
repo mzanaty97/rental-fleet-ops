@@ -1,0 +1,51 @@
+package com.rfo.model;
+
+public class Address {
+
+    private String street;
+    private String city;
+    private CountryCode country;
+    private String postalCode;
+
+    
+    public Address(String street, String city, CountryCode country, String postalCode){
+        this.street = street;
+        this.city = city;
+        this.country = country;
+        this.postalCode = postalCode;
+    }
+    
+    //returns full address = street, city potalcode, country
+    public String getFullAddress() {
+        return street
+                + ", "
+                + city + " "
+                + postalCode
+                + ", "
+                + country;
+    }
+
+    public String getCity() {
+        return this.city;
+    }
+
+    public CountryCode getCountry() {
+        return this.country;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setCountry(CountryCode country) {
+        this.country = country;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+}

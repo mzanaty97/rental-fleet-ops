@@ -1,0 +1,23 @@
+# Compiled class files
+RFO/build/*.class
+
+# NetBeans build/output directories
+RFO/build/
+RFO/dist/
+RFO/nbbuild/
+RFO/nbdist/
+
+# NetBeans private project settings (machine-specific)
+RFO/nbproject/private/
+
+# Log files
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# IDE files (in case you also open it elsewhere)
+.vscode/
+.idea/
+*.iml
