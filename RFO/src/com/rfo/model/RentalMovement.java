@@ -10,62 +10,44 @@ public class RentalMovement extends DrivenMovement {
 
     private static final double RSA_DAILY_RATE = 9.0;
 
-    private enum Equipment {
-        CHILD_SEAT(16.5),
-        ADDITIONAL_DRIVER(10.0),
-        SNOW_CHAINS(7.0);
-
-        private double dailyRate;
-
-        private Equipment(double dailyRate) {
-            this.dailyRate = dailyRate;
-        }
-
-        private double getDailyRate() {
-            return this.dailyRate;
-        }
-
-        private void setDailyRate(double dailyRate) {
-            this.dailyRate = dailyRate;
-        }
-    }
-
-    enum Insurance {
-        BASIC(0.0),
-        MEDIUM(0.8),
-        PREMIUM(1.0);
-
-        private final double rate;
-
-        private Insurance(double rate) {
-            this.rate = rate;
-        }
-
-        private double getRate() {
-            return this.rate;
-        }
-    }
-
     private Insurance insuranceTier;
     private boolean rsa;
     private Map<Equipment, Integer> equipment;
     private double price;
 
+    // new movement
     public RentalMovement(Vehicle vehicle,
             String COStaff,
             Location checkOutLoc,
             int odoOut,
-            List<Driver> drivers,
+            List<Integer> driverIDs,
             LocalDateTime expectedCIDT,
             Location expectedCILoc,
             boolean rsa,
             Insurance insuranceTier) {
-
-        super(vehicle, COStaff, checkOutLoc, odoOut, drivers, expectedCIDT, expectedCILoc);
+        super(vehicle, COStaff, checkOutLoc, odoOut, driverIDs, expectedCIDT, expectedCILoc);
         this.rsa = rsa;
         this.insuranceTier = insuranceTier;
         this.equipment = new HashMap<>();
         this.vehicle.updateStatus(VehicleStatus.IN_USE);
+    }
+
+    // reconstructing rental movement from file
+    public RentalMovement(String movementID, Vehicle vehicle, String COStaff, String CIStaff,
+            LocalDateTime checkOutDT, LocalDateTime checkInDT,
+            Location checkOutLoc, Location checkInLoc,
+            int odoOut, int odoIn, MovementStatus status,
+            List<Integer> driverIDs, LocalDateTime expectedCIDT, Location expectedCILoc,
+            boolean rsa, Insurance insuranceTier, Map<Equipment, Integer> equipment, double price) {
+
+        super(movementID, vehicle, COStaff, CIStaff, checkOutDT, checkInDT,
+                checkOutLoc, checkInLoc, odoOut, odoIn, status,
+                driverIDs, expectedCIDT, expectedCILoc);
+
+        this.rsa = rsa;
+        this.insuranceTier = insuranceTier;
+        this.equipment = equipment;
+        this.price = price;
     }
 
     public void addEquipment(Equipment item, int quantity) {

@@ -5,9 +5,28 @@ import java.util.List;
 
 public class WorkshopMovement extends DrivenMovement {
 
-    public WorkshopMovement(Vehicle vehicle, String COStaff, Location location, int odoOut, List<Driver> drivers, LocalDateTime expectedCIDT, Location expectedCILoc) {
-        super(vehicle, COStaff, location, odoOut, drivers, expectedCIDT, expectedCILoc);
+    // new movement
+    public WorkshopMovement(Vehicle vehicle,
+            String COStaff,
+            Location location,
+            int odoOut,
+            List<Integer> driverIDs,
+            LocalDateTime expectedCIDT,
+            Location expectedCILoc) {
+        super(vehicle, COStaff, location, odoOut, driverIDs, expectedCIDT, expectedCILoc);
         vehicle.updateStatus(VehicleStatus.WORKSHOP);
+    }
+
+    // reconstructing workshop movement from file
+    public WorkshopMovement(String movementID, Vehicle vehicle, String COStaff, String CIStaff,
+            LocalDateTime checkOutDT, LocalDateTime checkInDT,
+            Location checkOutLoc, Location checkInLoc,
+            int odoOut, int odoIn, MovementStatus status,
+            List<Integer> driverIDs, LocalDateTime expectedCIDT, Location expectedCILoc) {
+
+        super(movementID, vehicle, COStaff, CIStaff, checkOutDT, checkInDT,
+                checkOutLoc, checkInLoc, odoOut, odoIn, status,
+                driverIDs, expectedCIDT, expectedCILoc);
     }
 
     @Override

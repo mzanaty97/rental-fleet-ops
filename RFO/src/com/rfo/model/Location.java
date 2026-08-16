@@ -15,20 +15,32 @@ public class Location {
         this.address = address;
     }
 
+    public List<Vehicle> getAvailableVehicles() {
+        List<Vehicle> vehicles = new ArrayList<>();
+        return vehicles;
+    }
+
     public String getLocationID() {
         return locationID;
+    }
+
+    public void setLocationID(String locationID) {
+        this.locationID = locationID;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Address getAddress() {
         return address;
     }
 
-    public List<Vehicle> getAvailableVehicles() {
-        List<Vehicle> vehicles = new ArrayList<>();
-        return vehicles;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

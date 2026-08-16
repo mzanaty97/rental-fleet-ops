@@ -5,27 +5,40 @@ import java.util.List;
 
 public abstract class DrivenMovement extends Movement {
 
-    protected List<Driver> drivers;
+    protected List<Integer> driverIDs;
     protected LocalDateTime expectedCIDT;
     protected Location expectedCILoc;
 
+    // new movement
     public DrivenMovement(Vehicle vehicle, String COStaff, Location location, int odoOut,
-            List<Driver> drivers, LocalDateTime expectedCIDT, Location expectedCILoc) {
-
+            List<Integer> driverIDs, LocalDateTime expectedCIDT, Location expectedCILoc) {
         super(vehicle, COStaff, location, odoOut);
-
-        this.drivers = drivers;
+        this.driverIDs = driverIDs;
         this.expectedCIDT = expectedCIDT;
         this.expectedCILoc = expectedCILoc;
-
     }
 
-    public void addDriver(Driver driver) {
-        this.drivers.add(driver);
+    // reconstructing driven movement from file
+    protected DrivenMovement(String movementID, Vehicle vehicle, String COStaff, String CIStaff,
+            LocalDateTime checkOutDT, LocalDateTime checkInDT,
+            Location checkOutLoc, Location checkInLoc,
+            int odoOut, int odoIn, MovementStatus status,
+            List<Integer> driverIDs, LocalDateTime expectedCIDT, Location expectedCILoc) {
+
+        super(movementID, vehicle, COStaff, CIStaff, checkOutDT, checkInDT,
+                checkOutLoc, checkInLoc, odoOut, odoIn, status);
+
+        this.driverIDs = driverIDs;
+        this.expectedCIDT = expectedCIDT;
+        this.expectedCILoc = expectedCILoc;
     }
 
-    public List<Driver> getDrivers() {
-        return drivers;
+    public void addDriver(int driverID) {
+        this.driverIDs.add(driverID);
+    }
+
+    public List<Integer> getDriverIDs() {
+        return driverIDs;
     }
 
     public LocalDateTime getExpectedCIDT() {
@@ -48,5 +61,4 @@ public abstract class DrivenMovement extends Movement {
         vehicle.updateStatus(VehicleStatus.AVAILABLE);
         this.status = MovementStatus.CLOSED;
     }
-
 }
