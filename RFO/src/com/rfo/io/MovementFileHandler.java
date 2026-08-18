@@ -16,8 +16,10 @@ import java.util.Map;
 public class MovementFileHandler {
 
     private static final String FILE_PATH = "data/movements.txt";
+    // type|movementID|plateNumber|COStaff|CIStaff|checkOutDT|checkInDT|checkOutLocID|checkInLocID|
+    //   odoOut|odoIn|status|[type-specific fields]
 
-    private List<Movement> loadAll(List<Vehicle> allVehicles, List<Location> allLocations) {
+    public List<Movement> loadAll(List<Vehicle> allVehicles, List<Location> allLocations) {
         List<Movement> movements = new ArrayList<>();
         File file = new File(FILE_PATH);
 
@@ -51,7 +53,7 @@ public class MovementFileHandler {
         return movements;
     }
 
-    private void saveAll(List<Movement> movements) {
+    public void saveAll(List<Movement> movements) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Movement movement : movements) {
                 writer.write(toLine(movement));
@@ -60,39 +62,6 @@ public class MovementFileHandler {
         } catch (IOException e) {
             System.out.println("Error writing movements file: " + e.getMessage());
         }
-    }
-
-    public List<Movement> getAll(List<Vehicle> allVehicles, List<Location> allLocations) {
-        return loadAll(allVehicles, allLocations);
-    }
-
-    public Movement getBy(String movementID, List<Vehicle> allVehicles, List<Location> allLocations) {
-        for (Movement m : loadAll(allVehicles, allLocations)) {
-            if (m.getMovementID().equals(movementID)) {
-                return m;
-            }
-        }
-        System.out.println("Movement not found: " + movementID);
-        return null;
-    }
-
-    public void save(Movement movement, List<Vehicle> allVehicles, List<Location> allLocations) {
-        List<Movement> all = loadAll(allVehicles, allLocations);
-        boolean found = false;
-
-        for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getMovementID().equals(movement.getMovementID())) {
-                all.set(i, movement);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            all.add(movement);
-        }
-
-        saveAll(all);
     }
 
     private Map<String, Vehicle> buildVehicleLookup(List<Vehicle> allVehicles) {

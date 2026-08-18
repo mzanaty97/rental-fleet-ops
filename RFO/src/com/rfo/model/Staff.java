@@ -28,7 +28,7 @@ public class Staff implements Person {
 
     @Override
     public String getName() {
-        return fName + " " + lName;
+        return getFName() + " " + getLName();
     }
 
     @Override
@@ -68,6 +68,26 @@ public class Staff implements Person {
 
     public StaffRole getRole() {
         return role;
+    }
+
+    public Location getCurrentLocation() {
+        return this.currentLocation;
+    }
+
+    public String getFName() {
+        return fName;
+    }
+
+    public void setFName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getLName() {
+        return lName;
+    }
+
+    public void setLName(String lName) {
+        this.lName = lName;
     }
 
 }

@@ -18,7 +18,7 @@ public class DriverFileHandler {
     // drivers saved in "driverID|fName|lName|licenseNumber|email|phoneNumber|street|city|country|postalCode" format
     // file is always kept in ascending driverID order
 
-    private List<Driver> loadAll() {
+    public List<Driver> loadAll() {
         List<Driver> drivers = new ArrayList<>();
         File file = new File(FILE_PATH);
 
@@ -44,7 +44,7 @@ public class DriverFileHandler {
         return drivers;
     }
 
-    private void saveAll(List<Driver> drivers) {
+    public void saveAll(List<Driver> drivers) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Driver driver : drivers) {
                 writer.write(toLine(driver));
@@ -53,52 +53,6 @@ public class DriverFileHandler {
         } catch (IOException e) {
             System.out.println("Error writing drivers file: " + e.getMessage());
         }
-    }
-
-    public Driver getBy(int driverID) {
-        List<Driver> all = loadAll();
-        for (Driver driver : all) {
-            if (driver.getDriverID() == driverID) {
-                return driver;
-            }
-        }
-        System.out.println("Driver not found: " + driverID);
-        return null;
-    }
-
-    public List<Driver> search(String fName, String lName) {
-        List<Driver> results = new ArrayList<>();
-        List<Driver> all = loadAll();
-
-        for (Driver driver : all) {
-            if (driver.getFName().equalsIgnoreCase(fName) && driver.getLName().equalsIgnoreCase(lName)) {
-                results.add(driver);
-            }
-        }
-
-        return results;
-    }
-
-    public Driver addDriver(String fName, String lName, String licenseNumber, String email,
-            String phoneNumber, Address address) {
-
-        List<Driver> all = loadAll();
-
-        for (Driver existing : all) {
-            if (existing.getFName().equalsIgnoreCase(fName)
-                    && existing.getLName().equalsIgnoreCase(lName)
-                    && existing.getLicenseNumber().equals(licenseNumber)
-                    && existing.getEmail().equals(email)
-                    && existing.getPhoneNumber().equals(phoneNumber)) {
-                System.out.println("This is a duplicate of Driver " + existing.getDriverID());
-                return null;
-            }
-        }
-
-        Driver newDriver = new Driver(fName, lName, licenseNumber, email, phoneNumber, address);
-        all.add(newDriver);
-        saveAll(all);
-        return newDriver;
     }
 
     private Driver parseLine(String ln) {

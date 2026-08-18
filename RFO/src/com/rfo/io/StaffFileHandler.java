@@ -18,32 +18,37 @@ public class StaffFileHandler {
 
     private static final String FILE_PATH = "data/staff.txt";
     // staff saved in "staffID|password|fName|lName|role|currentLocationID|accessibleLocationID1,accessibleLocationID2,..." format
-    // password is never loaded into a Staff object — only read directly here for authentication
+    // password is never loaded into a Staff object - only read directly here for authentication
 
-    private List<String[]> loadRawLines() {
-        List<String[]> lines = new ArrayList<>();
+    public List<Staff> loadAll(List<Location> allLocations) {
+        List<Staff> staffList = new ArrayList<>();
         File file = new File(FILE_PATH);
 
         if (!file.exists()) {
-            return lines;
+            return staffList;
         }
+
+        Map<String, Location> locationsById = buildLocationLookup(allLocations);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String ln;
             while ((ln = reader.readLine()) != null) {
-                lines.add(ln.split("\\|"));
+                staffList.add(parseLine(ln, locationsById));
             }
         } catch (IOException e) {
             System.out.println("Error reading staff file: " + e.getMessage());
         }
 
-        return lines;
+        return staffList;
     }
 
-    private void saveAllRaw(List<String[]> lines) {
+    public void saveAll(List<Staff> staffList) {
+        Map<String, String> existingPasswords = loadPasswordsByStaffID();
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (String[] fields : lines) {
-                writer.write(String.join("|", fields));
+            for (Staff staff : staffList) {
+                String password = existingPasswords.getOrDefault(staff.getStaffID(), "");
+                writer.write(toLine(staff, password));
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -51,61 +56,56 @@ public class StaffFileHandler {
         }
     }
 
+    // Reads the file directly every call - password is never cached in memory
     public boolean authenticate(String staffID, String password) {
-        for (String[] fields : loadRawLines()) {
-            if (fields[0].equals(staffID)) {
-                return fields[1].equals(password);
-            }
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return false;
         }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String ln;
+            while ((ln = reader.readLine()) != null) {
+                String[] fields = ln.split("\\|");
+                if (fields[0].equals(staffID)) {
+                    return fields[1].equals(password);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading staff file: " + e.getMessage());
+        }
+
         System.out.println("Staff not found: " + staffID);
         return false;
     }
 
-    public Staff getBy(String staffID, List<Location> allLocations) {
-        Map<String, Location> locationsById = buildLocationLookup(allLocations);
-
-        for (String[] fields : loadRawLines()) {
-            if (fields[0].equals(staffID)) {
-                return parseFields(fields, locationsById);
-            }
+    public void addNewStaffLine(Staff staff, String password) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) { // append mode
+            writer.write(toLine(staff, password));
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error adding staff: " + e.getMessage());
         }
-
-        System.out.println("Staff not found: " + staffID);
-        return null;
     }
 
-    public List<Staff> search(String fName, String lName, List<Location> allLocations) {
-        List<Staff> results = new ArrayList<>();
-        Map<String, Location> locationsById = buildLocationLookup(allLocations);
-
-        for (String[] fields : loadRawLines()) {
-            if (fields[2].equalsIgnoreCase(fName) && fields[3].equalsIgnoreCase(lName)) {
-                results.add(parseFields(fields, locationsById));
-            }
+    private Map<String, String> loadPasswordsByStaffID() {
+        Map<String, String> passwords = new HashMap<>();
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return passwords;
         }
 
-        return results;
-    }
-
-    public Staff addStaff(String staffID, String password, String fName, String lName, StaffRole role) {
-        List<String[]> lines = loadRawLines();
-
-        for (String[] fields : lines) {
-            if (fields[0].equals(staffID)) {
-                System.out.println("Duplicate staffID: " + staffID + " already exists.");
-                return null;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String ln;
+            while ((ln = reader.readLine()) != null) {
+                String[] fields = ln.split("\\|");
+                passwords.put(fields[0], fields[1]);
             }
+        } catch (IOException e) {
+            System.out.println("Error reading staff file: " + e.getMessage());
         }
 
-        Staff newStaff = new Staff(staffID, fName, lName, role);
-
-        String[] newLine = {
-            staffID, password, fName, lName, role.toString(), "", ""
-        };
-        lines.add(newLine);
-        saveAllRaw(lines);
-
-        return newStaff;
+        return passwords;
     }
 
     private Map<String, Location> buildLocationLookup(List<Location> allLocations) {
@@ -116,8 +116,11 @@ public class StaffFileHandler {
         return locationsById;
     }
 
-    private Staff parseFields(String[] fields, Map<String, Location> locationsById) {
+    private Staff parseLine(String ln, Map<String, Location> locationsById) {
+        String[] fields = ln.split("\\|");
+
         String staffID = fields[0];
+        // fields[1] = password - intentionally skipped, never loaded into Staff
         String fName = fields[2];
         String lName = fields[3];
         StaffRole role = StaffRole.valueOf(fields[4]);
@@ -136,5 +139,30 @@ public class StaffFileHandler {
         }
 
         return new Staff(staffID, fName, lName, role, accessibleLocations, currentLocation);
+    }
+
+    private String toLine(Staff staff, String password) {
+        StringBuilder accessibleIDs = new StringBuilder();
+        List<Location> accessibleLocations = staff.getAccessibleLocations();
+        for (int i = 0; i < accessibleLocations.size(); i++) {
+            accessibleIDs.append(accessibleLocations.get(i).getLocationID());
+            if (i < accessibleLocations.size() - 1) {
+                accessibleIDs.append(",");
+            }
+        }
+
+        String currentLocationID = staff.getCurrentLocation() != null
+                ? staff.getCurrentLocation().getLocationID()
+                : "";
+
+        return String.join("|",
+                staff.getStaffID(),
+                password,
+                staff.getFName(),
+                staff.getLName(),
+                staff.getRole().toString(),
+                currentLocationID,
+                accessibleIDs.toString()
+        );
     }
 }

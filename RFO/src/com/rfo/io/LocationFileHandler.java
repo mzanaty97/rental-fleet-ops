@@ -17,7 +17,7 @@ public class LocationFileHandler {
     private static final String FILE_PATH = "data/locations.txt";
     // locations saved in "locationID|name|street|city|country|postalCode" format
 
-    private List<Location> loadAll() {
+    public List<Location> loadAll() {
         List<Location> locations = new ArrayList<>();
         File file = new File(FILE_PATH);
 
@@ -37,7 +37,7 @@ public class LocationFileHandler {
         return locations;
     }
 
-    private void saveAll(List<Location> locations) {
+    public void saveAll(List<Location> locations) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Location location : locations) {
                 writer.write(toLine(location));
@@ -46,46 +46,6 @@ public class LocationFileHandler {
         } catch (IOException e) {
             System.out.println("Error writing locations into file: " + e.getMessage());
         }
-    }
-
-    public List<Location> getAll() {
-        return loadAll();
-    }
-
-    public Location getBy(String locationID) {
-        for (Location location : loadAll()) {
-            if (location.getLocationID().equals(locationID)) {
-                return location;
-            }
-        }
-        System.out.println("Location not found: " + locationID);
-        return null;
-    }
-
-    public List<Location> search(String name) {
-        List<Location> results = new ArrayList<>();
-        for (Location location : loadAll()) {
-            if (location.getName().equalsIgnoreCase(name)) {
-                results.add(location);
-            }
-        }
-        return results;
-    }
-
-    public Location addLocation(String locationID, String name, Address address) {
-        List<Location> all = loadAll();
-
-        for (Location existing : all) {
-            if (existing.getLocationID().equals(locationID)) {
-                System.out.println("Duplicate locationID: " + locationID + " already exists.");
-                return null;
-            }
-        }
-
-        Location newLocation = new Location(locationID, name, address);
-        all.add(newLocation);
-        saveAll(all);
-        return newLocation;
     }
 
     private Location parseLine(String ln) {
