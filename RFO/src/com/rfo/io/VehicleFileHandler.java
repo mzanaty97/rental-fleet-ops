@@ -64,7 +64,7 @@ public class VehicleFileHandler {
     }
 
     private Vehicle parseLine(String ln, Map<String, Location> locationsById) {
-        String[] fields = ln.split("\\|");
+        String[] fields = ln.split("\\|", -1);
 
         String plateNumber = fields[0];
         String make = fields[1];

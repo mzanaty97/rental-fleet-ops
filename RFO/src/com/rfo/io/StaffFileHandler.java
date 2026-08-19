@@ -117,7 +117,7 @@ public class StaffFileHandler {
     }
 
     private Staff parseLine(String ln, Map<String, Location> locationsById) {
-        String[] fields = ln.split("\\|");
+        String[] fields = ln.split("\\|", -1);
 
         String staffID = fields[0];
         // fields[1] = password - intentionally skipped, never loaded into Staff

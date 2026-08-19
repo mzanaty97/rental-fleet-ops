@@ -57,7 +57,9 @@ public abstract class DrivenMovement extends Movement {
         vehicle.updateStatus(VehicleStatus.TO_BE_CLEANED);
     }
 
-    public void closeMovement() {
+    public void closeMovement(int odoIn) {
+        this.odoIn = odoIn;
+        execute();
         vehicle.updateStatus(VehicleStatus.AVAILABLE);
         this.status = MovementStatus.CLOSED;
     }

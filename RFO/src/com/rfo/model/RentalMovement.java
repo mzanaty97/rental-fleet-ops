@@ -110,9 +110,9 @@ public class RentalMovement extends DrivenMovement {
         return base + calculateEquipmentCost(days) + calculateInsuranceCost(days);
     }
 
-    public void closeMovement(double finalPrice) {
+    public void closeMovement(int odoIn, double finalPrice) {
         this.price = finalPrice;
-        super.closeMovement();
+        super.closeMovement(odoIn);
     }
 
     public double getPrice() {

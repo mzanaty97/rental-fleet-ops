@@ -78,6 +78,10 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
         return rate;
     }
 
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
+
     public boolean hasGPS() {
         return hasGPS;
     }
@@ -155,8 +159,8 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
             serviceFlag = true;
         }
     }
-    
-    public int getOverdueKm(){
+
+    public int getOverdueKm() {
         return (currentOdometer - lastServiceOdometer) - getServiceInterval();
     }
 

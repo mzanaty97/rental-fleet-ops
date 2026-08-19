@@ -99,7 +99,7 @@ public class MovementFileHandler {
     }
 
     private Movement parseLine(String ln, Map<String, Vehicle> vehiclesByPlate, Map<String, Location> locationsById) {
-        String[] f = ln.split("\\|");
+        String[] f = ln.split("\\|", -1);
 
         String type = f[0];
         String movementID = f[1];
@@ -215,7 +215,7 @@ public class MovementFileHandler {
                 movement.getCIStaff() != null ? movement.getCIStaff() : "",
                 movement.getCheckOutDT().toString(),
                 movement.getCheckInDT() != null ? movement.getCheckInDT().toString() : "",
-                movement.getCheckOutLoc().getLocationID(),
+                movement.getCheckOutLoc() != null ? movement.getCheckOutLoc().getLocationID() : "",
                 movement.getCheckInLoc() != null ? movement.getCheckInLoc().getLocationID() : "",
                 String.valueOf(movement.getOdoOut()),
                 String.valueOf(movement.getOdoIn()),

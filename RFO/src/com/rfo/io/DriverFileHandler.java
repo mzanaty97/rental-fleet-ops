@@ -56,7 +56,7 @@ public class DriverFileHandler {
     }
 
     private Driver parseLine(String ln) {
-        String[] fields = ln.split("\\|");
+        String[] fields = ln.split("\\|", -1);
 
         int driverID = Integer.parseInt(fields[0]);
         String fName = fields[1];

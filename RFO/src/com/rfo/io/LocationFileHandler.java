@@ -49,7 +49,7 @@ public class LocationFileHandler {
     }
 
     private Location parseLine(String ln) {
-        String[] fields = ln.split("\\|");
+        String[] fields = ln.split("\\|", -1);
 
         String locationID = fields[0];
         String name = fields[1];
