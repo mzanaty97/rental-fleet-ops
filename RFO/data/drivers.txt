@@ -1,0 +1,4 @@
+0|Fleet|Operations|GENERIC000|fleetops@rfo.local|0000000000|N/A|N/A|NZ|0000
+1|John|Smith|DL123456|john.smith@example.com|0211234567|10 Beach Road|Auckland|NZ|1010
+2|Emma|Wilson|DL654321|emma.wilson@example.com|0219876543|5 Hill Street|Wellington|NZ|6011
+87654319|Seed|Placeholder|SEED000|seed@rfo.local|0000000000|N/A|N/A|NZ|0000
