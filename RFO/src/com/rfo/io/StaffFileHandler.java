@@ -66,7 +66,7 @@ public class StaffFileHandler {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String ln;
             while ((ln = reader.readLine()) != null) {
-                String[] fields = ln.split("\\|");
+                String[] fields = ln.split("\\|", -1);
                 if (fields[0].equals(staffID)) {
                     return fields[1].equals(password);
                 }
@@ -98,7 +98,7 @@ public class StaffFileHandler {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String ln;
             while ((ln = reader.readLine()) != null) {
-                String[] fields = ln.split("\\|");
+                String[] fields = ln.split("\\|", -1);
                 passwords.put(fields[0], fields[1]);
             }
         } catch (IOException e) {
@@ -164,5 +164,47 @@ public class StaffFileHandler {
                 currentLocationID,
                 accessibleIDs.toString()
         );
+    }
+
+    public boolean updatePassword(String staffID, String newPassword) {
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return false;
+        }
+
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String ln;
+            while ((ln = reader.readLine()) != null) {
+                String[] fields = ln.split("\\|", -1);
+                if (fields[0].equals(staffID)) {
+                    fields[1] = newPassword;
+                    ln = String.join("|", fields);
+                    found = true;
+                }
+                lines.add(ln);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading staff file: " + e.getMessage());
+            return false;
+        }
+
+        if (!found) {
+            return false;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String ln : lines) {
+                writer.write(ln);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error writing staff file: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 }

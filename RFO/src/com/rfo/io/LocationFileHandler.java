@@ -57,9 +57,12 @@ public class LocationFileHandler {
         String city = fields[3];
         CountryCode country = CountryCode.valueOf(fields[4]);
         String postalCode = fields[5];
+        boolean active = fields.length > 6 ? Boolean.parseBoolean(fields[6]) : true;
 
         Address address = new Address(street, city, country, postalCode);
-        return new Location(locationID, name, address);
+        Location location = new Location(locationID, name, address);
+        location.setActive(active);
+        return location;
     }
 
     private String toLine(Location location) {
@@ -70,7 +73,8 @@ public class LocationFileHandler {
                 address.getStreet(),
                 address.getCity(),
                 address.getCountry().toString(),
-                address.getPostalCode()
+                address.getPostalCode(),
+                String.valueOf(location.isActive())
         );
     }
 }

@@ -97,11 +97,15 @@ public class DataStore {
         return null;
     }
 
-    boolean authenticate(String staffId, String passwrod) {
+    public boolean authenticate(String staffId, String passwrod) {
         return staffFileHandler.authenticate(staffId, passwrod);
     }
 
-    void addNewStaffLine(Staff newStaff, String password) {
+    public void addNewStaffLine(Staff newStaff, String password) {
         staffFileHandler.addNewStaffLine(newStaff, password);
+    }
+
+    public boolean updateStaffPassword(String staffID, String newPassword) {
+        return staffFileHandler.updatePassword(staffID, newPassword);
     }
 }

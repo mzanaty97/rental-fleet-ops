@@ -8,6 +8,7 @@ public class Location {
     private String locationID;
     private String name;
     private Address address;
+    private boolean active = true;
 
     public Location(String locationID, String name, Address address) {
         this.locationID = locationID;
@@ -42,5 +43,13 @@ public class Location {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
