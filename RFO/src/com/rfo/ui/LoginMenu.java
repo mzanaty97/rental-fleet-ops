@@ -23,7 +23,7 @@ public class LoginMenu {
         String pwd;
         while (attempts < MAX_ATTEMPTS) {
             System.out.println("Staff ID: ");
-            staffId = scanner.nextLine();
+            staffId = scanner.nextLine().trim().toUpperCase();
 
             System.out.println("Password: ");
             pwd = scanner.nextLine();

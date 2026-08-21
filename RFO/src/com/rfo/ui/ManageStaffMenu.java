@@ -57,16 +57,18 @@ public class ManageStaffMenu extends Menu {
         }
 
         System.out.println("\n--- Staff ---");
-        System.out.println("Staff ID\t|\tName\t|\tRole\t|\tCurrent Location");
+        System.out.println(String.format("%-10s | %-20s | %-16s | %s",
+                "Staff ID", "Name", "Role", "Current Location"));
         for (Staff s : allStaff) {
             String loc = s.getCurrentLocation() != null ? s.getCurrentLocation().getName() : "N/A";
-            System.out.println(s.getStaffID() + "\t|\t" + s.getName() + "\t|\t" + s.getRole() + "\t|\t" + loc);
+            System.out.println(String.format("%-10s | %-20s | %-16s | %s",
+                    s.getStaffID(), s.getName(), s.getRole(), loc));
         }
     }
 
     private void addStaff() {
         System.out.print("Staff ID: ");
-        String staffID = scanner.nextLine();
+        String staffID = scanner.nextLine().trim().toUpperCase();
 
         System.out.print("Password: ");
         String password = scanner.nextLine();
@@ -99,7 +101,7 @@ public class ManageStaffMenu extends Menu {
         }
 
         System.out.print("Location ID to grant: ");
-        String locationID = scanner.nextLine();
+        String locationID = scanner.nextLine().trim().toUpperCase();
 
         Location location = dataStore.getBy(dataStore.getLocations(), l -> l.getLocationID().equals(locationID));
 
@@ -125,7 +127,7 @@ public class ManageStaffMenu extends Menu {
 
     private Staff findStaffByID() {
         System.out.print("Staff ID: ");
-        String staffID = scanner.nextLine();
+        String staffID = scanner.nextLine().trim().toUpperCase();
 
         Staff target = dataStore.getBy(dataStore.getStaff(), s -> s.getStaffID().equals(staffID));
 

@@ -8,6 +8,7 @@ import com.rfo.model.VehicleCategory;
 import com.rfo.model.WorkshopMovement;
 import com.rfo.service.DataStore;
 import com.rfo.service.MovementService;
+import com.rfo.service.StaffService;
 import com.rfo.service.VehicleService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,11 +18,13 @@ public class NonRevenueMovementsMenu extends Menu {
 
     private VehicleService vehicleService;
     private MovementService movementService;
+    private StaffService staffService;
 
     public NonRevenueMovementsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
         this.vehicleService = new VehicleService(dataStore);
         this.movementService = new MovementService(dataStore);
+        this.staffService = new StaffService(dataStore);
     }
 
     @Override
@@ -31,7 +34,7 @@ public class NonRevenueMovementsMenu extends Menu {
 
     @Override
     protected List<String> getOptions() {
-        return List.of("New Vehicle", "Car Transfer", "Workshop", "Defleet");
+        return staffService.getNonRevenueMovementsOptions(staff.getRole());
     }
 
     @Override

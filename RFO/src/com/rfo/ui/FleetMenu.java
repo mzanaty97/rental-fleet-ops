@@ -5,14 +5,18 @@ import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleCategory;
 import com.rfo.model.VehicleStatus;
 import com.rfo.service.DataStore;
+import com.rfo.service.StaffService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class FleetMenu extends Menu {
 
+    private StaffService staffService;
+
     public FleetMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
+        this.staffService = new StaffService(dataStore);
     }
 
     @Override
@@ -22,7 +26,7 @@ public class FleetMenu extends Menu {
 
     @Override
     protected List<String> getOptions() {
-        return List.of("Query Available Vehicles", "Query Service Due Vehicles", "Update Vehicle Status");
+        return staffService.getFleetOptions(staff.getRole());
     }
 
     @Override
@@ -94,7 +98,7 @@ public class FleetMenu extends Menu {
 
     private void updateVehicleStatus() {
         System.out.println("Plate number: ");
-        String input = scanner.nextLine();
+        String input = scanner.nextLine().trim().toUpperCase();
 
         Vehicle vehicle = dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(input));
 

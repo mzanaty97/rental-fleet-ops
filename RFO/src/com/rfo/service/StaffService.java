@@ -3,6 +3,7 @@ package com.rfo.service;
 import com.rfo.model.Location;
 import com.rfo.model.Staff;
 import com.rfo.model.StaffRole;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StaffService {
@@ -20,9 +21,9 @@ public class StaffService {
             case AGENT:
                 return List.of("Admin", "Movements", "Fleet", "Reports");
             case MECHANIC:
-                return List.of("Movements", "Fleet", "Reports");
+                return List.of("Admin", "Movements", "Fleet", "Reports");
             case FLEET_OPERATOR:
-                return List.of("Movements", "Fleet", "Reports");
+                return List.of("Admin", "Movements", "Fleet", "Reports");
             default:
                 return List.of();
         }
@@ -81,5 +82,67 @@ public class StaffService {
         target.switchLocation(null);
         dataStore.saveStaff();
         return true;
+    }
+
+    public List<String> getMovementsOptions(StaffRole role) {
+        return List.of("Revenue Movements", "Non-Revenue Movements", "Movement Details");
+    }
+
+    public List<String> getRevenueMovementsOptions(StaffRole role) {
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT) {
+            return List.of("Checkout", "Check In", "Close Rental", "Amend Rental", "Changeover", "Print Invoice");
+        }
+        return List.of();
+    }
+
+    public List<String> getNonRevenueMovementsOptions(StaffRole role) {
+        List<String> options = new ArrayList<>();
+        if (role == StaffRole.MANAGER || role == StaffRole.FLEET_OPERATOR) {
+            options.add("New Vehicle");
+        }
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT || role == StaffRole.FLEET_OPERATOR) {
+            options.add("Car Transfer");
+        }
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT || role == StaffRole.MECHANIC) {
+            options.add("Workshop");
+        }
+        if (role == StaffRole.MANAGER || role == StaffRole.FLEET_OPERATOR) {
+            options.add("Defleet");
+        }
+        return options;
+    }
+
+    public List<String> getMovementDetailsOptions(StaffRole role) {
+        List<String> options = new ArrayList<>();
+        options.add("Query Movement Details");
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT) {
+            options.add("Query Drivers");
+        }
+        return options;
+    }
+
+    public List<String> getFleetOptions(StaffRole role) {
+        List<String> options = new ArrayList<>();
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT || role == StaffRole.FLEET_OPERATOR) {
+            options.add("Query Available Vehicles");
+        }
+        if (role == StaffRole.MANAGER || role == StaffRole.AGENT || role == StaffRole.MECHANIC) {
+            options.add("Query Service Due Vehicles");
+        }
+        if (role == StaffRole.MANAGER || role == StaffRole.FLEET_OPERATOR) {
+            options.add("Update Vehicle Status");
+        }
+        return options;
+    }
+
+    public List<String> getReportsOptions(StaffRole role) {
+        List<String> options = new ArrayList<>();
+        options.add("Out on Rental Report");
+        options.add("Location Fleet");
+        options.add("New Vehicles");
+        if (role == StaffRole.MANAGER) {
+            options.add("Staff Rental Reports");
+        }
+        return options;
     }
 }

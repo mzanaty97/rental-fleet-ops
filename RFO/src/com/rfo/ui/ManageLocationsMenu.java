@@ -55,19 +55,20 @@ public class ManageLocationsMenu extends Menu {
         }
 
         System.out.println("\n--- Locations ---");
-        System.out.println("Location ID\t|\tName\t|\tActive\t|\tAddress");
+        System.out.println(String.format("%-12s | %-30s | %-8s | %s",
+                "Location ID", "Name", "Active", "Address"));
         for (Location l : locations) {
-            System.out.println(l.getLocationID() + "\t|\t" + l.getName() + "\t|\t"
-                    + l.isActive() + "\t|\t" + l.getAddress().getFullAddress());
+            System.out.println(String.format("%-12s | %-30s | %-8s | %s",
+                    l.getLocationID(), l.getName(), l.isActive(), l.getAddress().getFullAddress()));
         }
     }
 
     private void addLocation() {
         System.out.print("Location ID: ");
-        String locationID = scanner.nextLine();
+        String locationID = scanner.nextLine().trim().toUpperCase();
 
         System.out.print("Name: ");
-        String name = scanner.nextLine();
+        String name = scanner.nextLine().trim().toUpperCase();
 
         System.out.print("Street: ");
         String street = scanner.nextLine();
@@ -101,7 +102,7 @@ public class ManageLocationsMenu extends Menu {
 
     private void closeLocation() {
         System.out.print("Location ID to close: ");
-        String locationID = scanner.nextLine();
+        String locationID = scanner.nextLine().trim().toUpperCase();
 
         Location location = dataStore.getBy(dataStore.getLocations(), l -> l.getLocationID().equals(locationID));
 
@@ -111,7 +112,7 @@ public class ManageLocationsMenu extends Menu {
         }
 
         System.out.print("Destination location ID for any vehicles there: ");
-        String newLocationID = scanner.nextLine();
+        String newLocationID = scanner.nextLine().trim().toUpperCase();
 
         boolean closed = service.closeLocation(location, newLocationID, staff.getStaffID());
 

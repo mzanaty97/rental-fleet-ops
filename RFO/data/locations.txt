@@ -1,3 +1,4 @@
 AKLC99|Auckland Intake Depot|1 Airport Road|Auckland|NZ|1010|true
 AKLC88|Auckland Retail Depot|22 Queen Street|Auckland|NZ|1010|true
 WLGX01|Wellington Depot|5 Lambton Quay|Wellington|NZ|6011|true
+AKLT01|Auckland International Airport|25Alaurence stevens drive|Auckalnd|NZ|2022|true

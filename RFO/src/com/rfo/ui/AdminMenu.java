@@ -42,35 +42,34 @@ public class AdminMenu extends Menu {
 
     private void changeLocation() {
         List<Location> access = staff.getAccessibleLocations();
-
         if (access.isEmpty()) {
             System.out.println("You have no accessible locations.");
             return;
         }
 
+        String currentName = staff.getCurrentLocation() != null
+                ? staff.getCurrentLocation().getName() + " (" + staff.getCurrentLocation().getLocationID() + ")"
+                : "None set";
+        System.out.println("Current location: " + currentName);
+
         System.out.println("Accessible locations: ");
-        for (int i = 0; i < access.size(); i++) {
-            System.out.println((i + 1) + ". (" + access.get(i).getLocationID() + ") " + access.get(i).getName());
+        for (Location loc : access) {
+            System.out.println("- (" + loc.getLocationID() + ") " + loc.getName());
         }
 
-        System.out.println("Choose location");
-        String input = scanner.nextLine();
+        System.out.print("Enter location ID: ");
+        String input = scanner.nextLine().trim().toUpperCase();
 
-        int choice;
+        Location selected = access.stream()
+                .filter(l -> l.getLocationID().equals(input))
+                .findFirst()
+                .orElse(null);
 
-        try {
-            choice = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid input");
+        if (selected == null) {
+            System.out.println("Invalid location ID, or you do not have access to it.");
             return;
         }
 
-        if (choice < 1 || choice > access.size()) {
-            System.out.println("Please choose a valid input");
-            return;
-        }
-
-        Location selected = access.get(choice - 1);
         service.switchLocation(staff, selected);
         System.out.println("Location changed to (" + selected.getLocationID() + ") " + selected.getName());
     }

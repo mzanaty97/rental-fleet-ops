@@ -6,13 +6,17 @@ import com.rfo.model.Movement;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Staff;
 import com.rfo.service.DataStore;
+import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
 
 public class MovementDetailsMenu extends Menu {
 
+    private StaffService staffService;
+
     public MovementDetailsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
+        this.staffService = new StaffService(dataStore);
     }
 
     @Override
@@ -22,7 +26,7 @@ public class MovementDetailsMenu extends Menu {
 
     @Override
     protected List<String> getOptions() {
-        return List.of("Query Movement Details", "Query Drivers");
+        return staffService.getMovementDetailsOptions(staff.getRole());
     }
 
     @Override

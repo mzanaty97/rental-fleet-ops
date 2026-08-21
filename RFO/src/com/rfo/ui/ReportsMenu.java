@@ -8,14 +8,18 @@ import com.rfo.model.Staff;
 import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleStatus;
 import com.rfo.service.DataStore;
+import com.rfo.service.StaffService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class ReportsMenu extends Menu {
 
+    private StaffService staffService;
+
     public ReportsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
+        this.staffService = new StaffService(dataStore);
     }
 
     @Override
@@ -25,7 +29,7 @@ public class ReportsMenu extends Menu {
 
     @Override
     protected List<String> getOptions() {
-        return List.of("Out on Rental Report", "Location Fleet", "New Vehicles", "Staff Rental Reports");
+        return staffService.getReportsOptions(staff.getRole());
     }
 
     @Override
@@ -89,7 +93,7 @@ public class ReportsMenu extends Menu {
 
     private void locationFleet() {
         System.out.println("Location ID: ");
-        String input = scanner.nextLine();
+        String input = scanner.nextLine().trim().toUpperCase();
 
         Location location = dataStore.getBy(dataStore.getLocations(),
                 l -> l.getLocationID().equals(input));
