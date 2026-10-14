@@ -46,7 +46,6 @@ public class LocationsView extends JPanel {
         topBar.add(countLabel);
         bottomBar.setBackground(Color.WHITE);
 
-        table.setRowHeight(26);
         table.setAutoCreateRowSorter(true);
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);

@@ -7,7 +7,7 @@ import com.rfo.service.AuthService;
 import com.rfo.service.DataStore;
 import com.rfo.service.StaffService;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import com.rfo.gui.theme.Theme;
 
 /**
  * Starts the Swing version of RFO: creates the model, views and controllers and
@@ -16,11 +16,7 @@ import javax.swing.UIManager;
 public class RFOGuiApp {
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // keep the default look and feel
-        }
+        Theme.installDefaults();
 
         // close the embedded Derby database cleanly when the window is closed
         Runtime.getRuntime().addShutdownHook(new Thread(() -> DBConnection.getInstance().shutdown()));

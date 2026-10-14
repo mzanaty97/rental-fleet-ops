@@ -1,15 +1,27 @@
 package com.rfo.gui.view;
 
+import com.rfo.gui.theme.BadgeLabel;
+import com.rfo.gui.theme.Icons;
+import com.rfo.gui.theme.Theme;
 import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleCategory;
 import com.rfo.model.VehicleStatus;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,9 +33,8 @@ import javax.swing.table.DefaultTableModel;
 /**
  * A vehicle table screen. The same view serves three Fleet menu options: it
  * always shows one kind of vehicles (its Mode), can offer a category filter on
- * top, and can offer a status bar at the bottom for changing the status of the
- * selected vehicle. The view only displays what the controller gives it; it
- * never reads the model itself.
+ * top, and can let the user click a vehicle's status to change it. The view
+ * only displays what the controller gives it; it never reads the model itself.
  */
 public class FleetView extends JPanel {
 
@@ -70,18 +81,22 @@ public class FleetView extends JPanel {
         }
     };
     private final JTable table = new JTable(tableModel);
-    private final JComboBox<VehicleStatus> statusBox = new JComboBox<>();
-    private final JButton applyButton = new JButton("Apply status");
+    private final List<ActionListener> listeners = new ArrayList<>();
+    private final boolean statusEditable;
+    private List<VehicleStatus> statusOptions = new ArrayList<>();
+    private VehicleStatus chosenStatus;
 
     /**
      * @param mode which vehicles this screen shows
      * @param showCategoryFilter offer the category drop down
-     * @param showStatusBar offer the bar for changing a vehicle's status
+     * @param statusEditable let the user click a status in the table to change
+     * it
      */
-    public FleetView(Mode mode, boolean showCategoryFilter, boolean showStatusBar) {
+    public FleetView(Mode mode, boolean showCategoryFilter, boolean statusEditable) {
         super(new BorderLayout());
         setBackground(Color.WHITE);
         this.mode = mode;
+        this.statusEditable = statusEditable;
 
         categoryBox.addItem(ALL_CATEGORIES);
         for (VehicleCategory category : VehicleCategory.values()) {
@@ -90,9 +105,6 @@ public class FleetView extends JPanel {
 
         add(buildFilterBar(showCategoryFilter), BorderLayout.NORTH);
         add(buildTable(), BorderLayout.CENTER);
-        add(buildStatusBar(showStatusBar), BorderLayout.SOUTH);
-
-        applyButton.setActionCommand(APPLY_COMMAND);
     }
 
     private JPanel buildFilterBar(boolean showCategoryFilter) {
@@ -103,23 +115,24 @@ public class FleetView extends JPanel {
             bar.add(categoryBox);
         }
         bar.add(countLabel);
+        if (statusEditable) {
+            JLabel hint = new JLabel("Click a status to change it.");
+            hint.setFont(Theme.F_SMALL);
+            hint.setForeground(Theme.TEXT_SECONDARY);
+            bar.add(hint);
+        }
         return bar;
     }
 
     private JScrollPane buildTable() {
-        table.setRowHeight(26);
         table.setAutoCreateRowSorter(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);
 
-        // picking a row pre-selects that vehicle's current status in the box below
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && table.getSelectedRow() >= 0) {
-                statusBox.setSelectedItem(VehicleStatus.valueOf(
-                        (String) table.getValueAt(table.getSelectedRow(), STATUS_COLUMN)));
-            }
-        });
+        if (statusEditable) {
+            installStatusClicks();
+        }
 
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
@@ -127,16 +140,110 @@ public class FleetView extends JPanel {
         return scroll;
     }
 
-    private JPanel buildStatusBar(boolean showStatusBar) {
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
-        bar.setBackground(Color.WHITE);
+    // clicking a status cell opens a small menu of the statuses the user may choose
+    private void installStatusClicks() {
+        table.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                table.setCursor(isStatusCell(e.getPoint()) ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor());
+            }
+        });
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && isStatusCell(e.getPoint())) {
+                    int row = table.rowAtPoint(e.getPoint());
+                    table.setRowSelectionInterval(row, row);
+                    showStatusMenu(row);
+                }
+            }
+        });
+    }
 
-        if (showStatusBar) {
-            bar.add(new JLabel("Set selected vehicle to:"));
-            bar.add(statusBox);
-            bar.add(applyButton);
+    private boolean isStatusCell(Point p) {
+        int row = table.rowAtPoint(p);
+        int col = table.columnAtPoint(p);
+        return row >= 0 && col >= 0 && table.convertColumnIndexToModel(col) == STATUS_COLUMN;
+    }
+
+    private void showStatusMenu(int row) {
+        VehicleStatus current = VehicleStatus.valueOf((String) table.getValueAt(row, STATUS_COLUMN));
+        int viewCol = table.convertColumnIndexToView(STATUS_COLUMN);
+        Rectangle cell = table.getCellRect(row, viewCol, false);
+
+        JPopupMenu menu = new JPopupMenu();
+        menu.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Theme.BORDER_CARD, 1),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+        menu.setBackground(Color.WHITE);
+        JLabel title = new JLabel("Change status to");
+        title.setFont(Theme.F_SMALL);
+        title.setForeground(Theme.TEXT_SECONDARY);
+        title.setBorder(BorderFactory.createEmptyBorder(2, 8, 6, 8));
+        title.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+        menu.add(title);
+        for (VehicleStatus status : statusOptions) {
+            StatusItem item = new StatusItem(status, status == current, menu);
+            item.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+            menu.add(item);
         }
-        return bar;
+        menu.show(table, cell.x, cell.y + cell.height);
+    }
+
+    /**
+     * One row of the status menu: the status as a coloured badge, with a tick
+     * on the current one.
+     */
+    private class StatusItem extends JPanel {
+
+        private final VehicleStatus status;
+
+        StatusItem(VehicleStatus status, boolean current, JPopupMenu menu) {
+            super(new BorderLayout(12, 0));
+            this.status = status;
+            setBackground(Color.WHITE);
+            setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            JPanel badge = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            badge.setOpaque(false);
+            badge.add(new BadgeLabel(status.toString(), true));
+            add(badge, BorderLayout.CENTER);
+            JLabel tick = new JLabel(current ? Icons.icon(Icons.Type.CHECK_CIRCLE, 16, Theme.PRIMARY) : null);
+            tick.setPreferredSize(new java.awt.Dimension(16, 16));
+            add(tick, BorderLayout.EAST);
+            setToolTipText(current ? "Current status" : null);
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    setBackground(Theme.BG_HOVER);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    setBackground(Color.WHITE);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    menu.setVisible(false);
+                    choose(StatusItem.this.status);
+                }
+            });
+        }
+
+        @Override
+        public java.awt.Dimension getPreferredSize() {
+            java.awt.Dimension d = super.getPreferredSize();
+            return new java.awt.Dimension(Math.max(d.width, 200), 36);
+        }
+    }
+
+    private void choose(VehicleStatus status) {
+        chosenStatus = status;
+        ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, APPLY_COMMAND);
+        for (ActionListener l : new ArrayList<>(listeners)) {
+            l.actionPerformed(event);
+        }
     }
 
     /**
@@ -187,21 +294,21 @@ public class FleetView extends JPanel {
     }
 
     /**
-     * The statuses the user may choose from in the status bar.
+     * The statuses the user may choose from in the status menu.
      */
     public void setStatusOptions(List<VehicleStatus> statuses) {
-        statusBox.removeAllItems();
-        for (VehicleStatus status : statuses) {
-            statusBox.addItem(status);
-        }
+        statusOptions = new ArrayList<>(statuses);
     }
 
+    /**
+     * The status the user just picked from the menu.
+     */
     public VehicleStatus getSelectedStatus() {
-        return (VehicleStatus) statusBox.getSelectedItem();
+        return chosenStatus;
     }
 
     public void addController(ActionListener controller) {
         categoryBox.addActionListener(controller);
-        applyButton.addActionListener(controller);
+        listeners.add(controller);
     }
 }

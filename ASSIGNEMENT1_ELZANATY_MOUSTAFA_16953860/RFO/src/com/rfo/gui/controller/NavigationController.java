@@ -37,7 +37,8 @@ public class NavigationController {
             labels.add(child.getLabel());
         }
 
-        MenuView menu = new MenuView(node.getLabel(), labels, parentKey != null);
+        boolean isMain = parentKey == null;
+        MenuView menu = new MenuView(isMain ? "What would you like to do?" : node.getLabel(), crumbs(key, true), labels, !isMain);
         menu.setMessageSink(sessionView.getConsole());
         menu.addController(e -> {
             String command = e.getActionCommand();
@@ -55,9 +56,28 @@ public class NavigationController {
         }
     }
 
+    /**
+     * The path shown above a title: "Main menu › Fleet". The main menu itself
+     * is just "Main menu".
+     */
+    private static String crumbs(String key, boolean includeMain) {
+        String[] parts = key.split("/");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i == 0 && !includeMain) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(" \u203A ");
+            }
+            sb.append(i == 0 ? "Main menu" : parts[i]);
+        }
+        return sb.toString();
+    }
+
     private void addFeature(String option, String key, String parentKey) {
         JComponent content = screenFactory.createScreen(option, sessionView, staff);
-        ScreenFrame frame = new ScreenFrame(option, content);
+        ScreenFrame frame = new ScreenFrame(option, crumbs(parentKey, false), content);
         frame.addController(e -> sessionView.showScreen(parentKey));
         sessionView.addScreen(key, frame);
     }

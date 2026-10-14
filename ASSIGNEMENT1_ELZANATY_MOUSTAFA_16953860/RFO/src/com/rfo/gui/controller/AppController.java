@@ -55,8 +55,7 @@ public class AppController implements ActionListener, LoginListener, SessionList
         new NavigationController(sessionView, menuService.getMenuFor(staff.getRole()), screenFactory, staff);
         dataStore.addListener(sessionView);
 
-        window.replaceTab(view, sessionView, staff.getFName() + " (" + staff.getStaffID() + ")",
-                ev -> closeTab(sessionView));
+        window.replaceTabWithSession(view, sessionView, staff, ev -> closeTab(sessionView));
     }
 
     // logging out does not close the tab, it goes back to the login form
