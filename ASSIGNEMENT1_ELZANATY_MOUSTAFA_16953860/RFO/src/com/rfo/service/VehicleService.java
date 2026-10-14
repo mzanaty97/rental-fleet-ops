@@ -18,18 +18,78 @@ public class VehicleService {
         this.dataStore = dataStore;
     }
 
+    /**
+     * The earliest model year accepted for a new vehicle.
+     */
+    public static final int MIN_YEAR = 1990;
+
+    /**
+     * True when a vehicle with this plate is already in the fleet (defleeted
+     * ones count too).
+     */
+    public boolean plateExists(String plateNumber) {
+        String plate = plateNumber == null ? "" : plateNumber.trim().toUpperCase();
+        return dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate)) != null;
+    }
+
+    /**
+     * Checks a plate for a new vehicle: letters and digits only, 2 to 8
+     * characters, not already used.
+     */
+    public String validatePlate(String plateNumber) {
+        String plate = plateNumber == null ? "" : plateNumber.trim().toUpperCase();
+        if (plate.isEmpty()) {
+            throw new IllegalArgumentException("Enter a plate number.");
+        }
+        if (!plate.matches("[A-Z0-9]{2,8}")) {
+            throw new IllegalArgumentException("Plate must be 2 to 8 letters or digits, no spaces.");
+        }
+        if (plateExists(plate)) {
+            throw new IllegalArgumentException("This plate is already in the fleet.");
+        }
+        return plate;
+    }
+
+    /**
+     * Turns the typed year into a number. Throws with the reason if it is not a
+     * sensible model year.
+     */
+    public int parseYear(String text) {
+        String t = text == null ? "" : text.trim();
+        if (!t.matches("\\d{4}")) {
+            throw new IllegalArgumentException("Enter a 4-digit year, for example 2024.");
+        }
+        int year = Integer.parseInt(t);
+        int max = java.time.Year.now().getValue() + 1;
+        if (year < MIN_YEAR || year > max) {
+            throw new IllegalArgumentException("Year must be between " + MIN_YEAR + " and " + max + ".");
+        }
+        return year;
+    }
+
+    /**
+     * Adds a vehicle at the intake depot. Throws with the reason if anything is
+     * wrong.
+     */
     public Vehicle addVehicle(String plateNumber, String make, String model, int year,
             VehicleCategory category, FuelType fuelType, boolean hasGPS, String staffID) {
 
-        Vehicle existing = dataStore.getBy(dataStore.getVehicles(),
-                v -> v.getPlateNumber().equals(plateNumber));
-
-        if (existing != null) {
-            System.out.println("Duplicate plateNumber: " + plateNumber + " already exists.");
-            return null;
+        String plate = validatePlate(plateNumber);
+        if (make == null || make.trim().isEmpty()) {
+            throw new IllegalArgumentException("Enter the make.");
+        }
+        if (model == null || model.trim().isEmpty()) {
+            throw new IllegalArgumentException("Enter the model.");
+        }
+        parseYear(String.valueOf(year));
+        if (category == null) {
+            throw new IllegalArgumentException("Choose a category.");
+        }
+        if (fuelType == null) {
+            throw new IllegalArgumentException("Choose a fuel type.");
         }
 
-        Vehicle newVehicle = new Vehicle(plateNumber, make, model, year, category, fuelType, hasGPS);
+        Vehicle newVehicle = new Vehicle(plate, make.trim(), model.trim(), year, category, fuelType, hasGPS);
         newVehicle.setRate(getDefaultRate(category));
 
         NewCarMovement ncm = new NewCarMovement(newVehicle, staffID);
@@ -44,14 +104,46 @@ public class VehicleService {
         return newVehicle;
     }
 
-    public boolean defleetVehicle(String plateNumber, String staffID) {
-        Vehicle vehicle = dataStore.getBy(dataStore.getVehicles(),
-                v -> v.getPlateNumber().equals(plateNumber));
+    /**
+     * The vehicles that could be defleeted: not already defleeted and not out
+     * on a movement.
+     */
+    public List<Vehicle> getVehiclesForDefleet() {
+        List<Vehicle> found = dataStore.search(dataStore.getVehicles(),
+                v -> v.getStatus() != VehicleStatus.DEFLEETED && v.getStatus() != VehicleStatus.IN_USE
+                && v.getStatus() != VehicleStatus.WORKSHOP);
+        found.sort(Comparator.comparing(Vehicle::getPlateNumber));
+        return found;
+    }
 
-        if (vehicle == null) {
-            System.out.println("Vehicle not found: " + plateNumber);
-            return false;
+    /**
+     * Finds a vehicle that can be defleeted: it must exist, not already be
+     * defleeted, and not be out.
+     */
+    public Vehicle findVehicleForDefleet(String plateNumber) {
+        String plate = plateNumber == null ? "" : plateNumber.trim().toUpperCase();
+        if (plate.isEmpty()) {
+            throw new IllegalArgumentException("Enter a plate number.");
         }
+        Vehicle vehicle = dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate));
+        if (vehicle == null) {
+            throw new IllegalArgumentException("No vehicle found with that plate number.");
+        }
+        if (vehicle.getStatus() == VehicleStatus.DEFLEETED) {
+            throw new IllegalArgumentException("That vehicle has already been defleeted.");
+        }
+        if (vehicle.getStatus() == VehicleStatus.IN_USE || vehicle.getStatus() == VehicleStatus.WORKSHOP) {
+            throw new IllegalArgumentException("That vehicle is out (" + vehicle.getStatus()
+                    + "). Check it in before defleeting.");
+        }
+        return vehicle;
+    }
+
+    /**
+     * Defleets a vehicle. Throws with the reason if it cannot be.
+     */
+    public Vehicle defleetVehicle(String plateNumber, String staffID) {
+        Vehicle vehicle = findVehicleForDefleet(plateNumber);
 
         DefleetMovement dvm = new DefleetMovement(vehicle, staffID);
         dvm.execute();
@@ -61,7 +153,7 @@ public class VehicleService {
         dataStore.saveVehicles();
         dataStore.saveMovements();
 
-        return true;
+        return vehicle;
     }
 
     // available vehicles, optionally for one category (null = every category)

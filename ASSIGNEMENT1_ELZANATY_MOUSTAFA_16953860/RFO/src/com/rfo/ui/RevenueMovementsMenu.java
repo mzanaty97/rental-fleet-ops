@@ -153,7 +153,7 @@ public class RevenueMovementsMenu extends Menu {
     }
 
     private void checkin() {
-        System.out.print("Movement ID: ");
+        System.out.print("Movement ID or plate number: ");
         String movementID = scanner.nextLine();
 
         try {
@@ -166,7 +166,7 @@ public class RevenueMovementsMenu extends Menu {
     }
 
     private void closeRental() {
-        System.out.print("Movement ID: ");
+        System.out.print("Movement ID or plate number: ");
         String movementID = scanner.nextLine();
 
         RentalMovement rental;
@@ -229,14 +229,14 @@ public class RevenueMovementsMenu extends Menu {
                 continue;
             }
 
-            if (!vehicle.isAvailable()) {
-                System.out.println("That vehicle is not available (status: " + vehicle.getStatus() + "). Try again.");
-                continue;
-            }
-
             if (vehicle.isDueForService()) {
                 System.out.println("That vehicle is overdue for service by "
                         + vehicle.getOverdueKm() + " km. Try again.");
+                continue;
+            }
+
+            if (!vehicle.isAvailable()) {
+                System.out.println("That vehicle is not available (status: " + vehicle.getStatus() + "). Try again.");
                 continue;
             }
 

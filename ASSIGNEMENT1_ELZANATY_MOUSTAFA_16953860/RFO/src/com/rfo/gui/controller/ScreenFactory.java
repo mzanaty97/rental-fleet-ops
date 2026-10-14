@@ -8,13 +8,16 @@ import com.rfo.gui.view.CheckoutView;
 import com.rfo.gui.view.CloseRentalView;
 import com.rfo.gui.view.ChangePasswordView;
 import com.rfo.gui.view.CloseLocationView;
+import com.rfo.gui.view.DefleetView;
 import com.rfo.gui.view.FleetView;
 import com.rfo.gui.view.GrantAccessView;
 import com.rfo.gui.view.LocationsView;
+import com.rfo.gui.view.NewVehicleView;
 import com.rfo.gui.view.PlaceholderView;
 import com.rfo.gui.view.RevokeAccessView;
 import com.rfo.gui.view.SessionView;
 import com.rfo.gui.view.StaffView;
+import com.rfo.gui.view.TransferView;
 import com.rfo.model.Staff;
 import com.rfo.service.LocationService;
 import com.rfo.service.MovementService;
@@ -71,6 +74,24 @@ public class ScreenFactory {
                 CloseRentalView closeRental = new CloseRentalView();
                 new CloseRentalController(closeRental, movementService, sessionView.getConsole());
                 return closeRental;
+            case "New Vehicle":
+                NewVehicleView newVehicle = new NewVehicleView();
+                new NewVehicleController(newVehicle, vehicleService, staff, sessionView.getConsole());
+                return newVehicle;
+            case "Car Transfer":
+                TransferView transfer = new TransferView(TransferView.Kind.TRANSFER);
+                sessionView.addModelListener(new TransferController(transfer, TransferView.Kind.TRANSFER,
+                        movementService, locationService, staff, sessionView.getConsole()));
+                return transfer;
+            case "Workshop":
+                TransferView workshop = new TransferView(TransferView.Kind.WORKSHOP);
+                sessionView.addModelListener(new TransferController(workshop, TransferView.Kind.WORKSHOP,
+                        movementService, locationService, staff, sessionView.getConsole()));
+                return workshop;
+            case "Defleet":
+                DefleetView defleet = new DefleetView();
+                new DefleetController(defleet, vehicleService, staff, sessionView.getConsole());
+                return defleet;
             case "View Staff":
                 StaffView staffList = new StaffView();
                 sessionView.addModelListener(new StaffListController(staffList, staffService));

@@ -111,10 +111,8 @@ public class LocationService {
                 CarTransferMovement ctm = movementService.startCTM(v.getPlateNumber(), staffID, location.getLocationID(),
                         genericDriver, java.time.LocalDateTime.now(), newLocation.getLocationID());
 
-                if (ctm != null) {
-                    movementService.checkIn(ctm, staffID, newLocation.getLocationID());
-                    movementService.closeDrivenMovement(ctm, v.getCurrentOdometer());
-                }
+                movementService.checkIn(ctm, staffID, newLocation.getLocationID());
+                movementService.closeDrivenMovement(ctm, v.getCurrentOdometer());
             }
         }
 

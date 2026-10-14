@@ -106,7 +106,14 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
         this.lastServiceOdometer = lastServiceOdometer;
     }
 
+    /**
+     * The status shown to the user: an available vehicle that is overdue for
+     * service shows as SERVICE_DUE.
+     */
     public VehicleStatus getStatus() {
+        if (status == VehicleStatus.AVAILABLE && serviceFlag) {
+            return VehicleStatus.SERVICE_DUE;
+        }
         return status;
     }
 
@@ -141,12 +148,8 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
 
     @Override
     public boolean isAvailable() {
-        if (this.status == VehicleStatus.AVAILABLE) {
-            return true;
-        } else {
-            return false;
-        }
-
+        // a vehicle that is overdue for service cannot be rented, so it is not available
+        return this.status == VehicleStatus.AVAILABLE && !serviceFlag;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class CloseRentalController implements ActionListener {
     private void toPayment() {
         RentalMovement r = lookup();
         if (r == null) {
-            console.error("Check the movement ID first.");
+            console.error("Check the movement ID or plate number first.");
             return;
         }
         try {

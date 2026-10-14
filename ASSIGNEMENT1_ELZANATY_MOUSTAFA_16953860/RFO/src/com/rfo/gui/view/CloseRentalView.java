@@ -46,7 +46,7 @@ public class CloseRentalView extends JPanel implements PlainScreen {
     private final JPanel stepCards = new JPanel(cards);
     private final JPanel stepper1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 0));
     private final JTextField idBox = new JTextField();
-    private final FormField idField = new FormField("Movement ID", false, idBox, null);
+    private final FormField idField = new FormField("Movement ID or plate number", false, idBox, null);
     private final JLabel idOk = new JLabel(" ");
     private final JTextField odoBox = new JTextField();
     private final FormField odoField = new FormField("Odometer at check in (km)", false, odoBox, null);

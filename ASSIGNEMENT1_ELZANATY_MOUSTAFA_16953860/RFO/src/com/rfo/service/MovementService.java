@@ -8,6 +8,7 @@ import com.rfo.model.Movement;
 import com.rfo.model.MovementStatus;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Vehicle;
+import com.rfo.model.VehicleStatus;
 import com.rfo.model.WorkshopMovement;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,21 @@ public class MovementService {
 
     public MovementService(DataStore dataStore) {
         this.dataStore = dataStore;
+    }
+
+    /**
+     * The vehicles at a location that are free to be moved (transfer or
+     * workshop): there and available.
+     */
+    public List<Vehicle> getVehiclesForNonRevenue(Location location) {
+        if (location == null) {
+            return new java.util.ArrayList<>();
+        }
+        List<Vehicle> found = dataStore.search(dataStore.getVehicles(), v -> v.getCurrentLocation() != null
+                && v.getCurrentLocation().getLocationID().equals(location.getLocationID())
+                && (v.getStatus() == VehicleStatus.AVAILABLE || v.getStatus() == VehicleStatus.SERVICE_DUE));
+        found.sort(java.util.Comparator.comparing(Vehicle::getPlateNumber));
+        return found;
     }
 
     /**
@@ -56,11 +72,12 @@ public class MovementService {
             throw new IllegalArgumentException("That vehicle is not at your current location ("
                     + checkOutLoc.getName() + ").");
         }
+        if (vehicle.isDueForService()) {
+            throw new IllegalArgumentException("That vehicle is due for service (overdue by " + vehicle.getOverdueKm()
+                    + " km). Send it to the workshop first.");
+        }
         if (!vehicle.isAvailable()) {
             throw new IllegalArgumentException("That vehicle is not available (status: " + vehicle.getStatus() + ").");
-        }
-        if (vehicle.isDueForService()) {
-            throw new IllegalArgumentException("That vehicle is overdue for service by " + vehicle.getOverdueKm() + " km.");
         }
         return vehicle;
     }
@@ -151,11 +168,12 @@ public class MovementService {
     }
 
     /**
-     * Finds a rental that is OPEN and can be checked in. Throws with the reason
-     * if not.
+     * Finds a rental that is OPEN and can be checked in. The text can be a
+     * movement ID or a plate number; a plate finds that vehicle's open rental.
+     * Throws with the reason if not.
      */
-    public RentalMovement findRentalForCheckIn(String movementID) {
-        RentalMovement rental = findRental(movementID);
+    public RentalMovement findRentalForCheckIn(String idOrPlate) {
+        RentalMovement rental = findRental(idOrPlate, MovementStatus.OPEN, "checked in");
         if (rental.getStatus() != MovementStatus.OPEN) {
             throw new IllegalArgumentException("This rental has already been checked in or closed.");
         }
@@ -163,30 +181,45 @@ public class MovementService {
     }
 
     /**
-     * Finds a rental that has been checked in and can be closed. Throws with
-     * the reason if not.
+     * Finds a rental that has been checked in and can be closed. The text can
+     * be a movement ID or a plate number; a plate finds that vehicle's
+     * checked-in rental. Throws with the reason if not.
      */
-    public RentalMovement findRentalForClose(String movementID) {
-        RentalMovement rental = findRental(movementID);
+    public RentalMovement findRentalForClose(String idOrPlate) {
+        RentalMovement rental = findRental(idOrPlate, MovementStatus.INCOMPLETE, "closed");
         if (rental.getStatus() != MovementStatus.INCOMPLETE) {
             throw new IllegalArgumentException("This rental must be checked in before it can be closed.");
         }
         return rental;
     }
 
-    private RentalMovement findRental(String movementID) {
-        String id = movementID == null ? "" : movementID.trim();
-        if (id.isEmpty()) {
-            throw new IllegalArgumentException("Enter a movement ID.");
+    /**
+     * Looks for a movement with this ID first, then for the rental of a vehicle
+     * with this plate in the wanted status.
+     */
+    private RentalMovement findRental(String idOrPlate, MovementStatus wanted, String action) {
+        String text = idOrPlate == null ? "" : idOrPlate.trim();
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("Enter a movement ID or a plate number.");
         }
-        Movement movement = dataStore.getBy(dataStore.getMovements(), m -> m.getMovementID().equals(id));
-        if (movement == null) {
-            throw new IllegalArgumentException("Movement not found.");
+        Movement movement = dataStore.getBy(dataStore.getMovements(), m -> m.getMovementID().equals(text));
+        if (movement != null) {
+            if (!(movement instanceof RentalMovement)) {
+                throw new IllegalArgumentException("That movement is not a rental.");
+            }
+            return (RentalMovement) movement;
         }
-        if (!(movement instanceof RentalMovement)) {
-            throw new IllegalArgumentException("That movement is not a rental.");
+        String plate = text.toUpperCase();
+        List<Movement> mine = dataStore.search(dataStore.getMovements(), m -> m instanceof RentalMovement
+                && m.getVehicle().getPlateNumber().equals(plate) && m.getStatus() == wanted);
+        if (!mine.isEmpty()) {
+            return (RentalMovement) mine.get(mine.size() - 1);
         }
-        return (RentalMovement) movement;
+        boolean knownPlate = dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate)) != null;
+        if (knownPlate) {
+            throw new IllegalArgumentException("There is no rental for " + plate + " that can be " + action + ".");
+        }
+        throw new IllegalArgumentException("No rental found for that movement ID or plate number.");
     }
 
     /**
@@ -240,7 +273,7 @@ public class MovementService {
             throw new IllegalArgumentException("That vehicle is not at your current location ("
                     + checkOutLoc.getName() + ").");
         }
-        if (!vehicle.isAvailable()) {
+        if (vehicle.getStatus() != VehicleStatus.AVAILABLE && vehicle.getStatus() != VehicleStatus.SERVICE_DUE) {
             throw new IllegalArgumentException("That vehicle is not available (status: " + vehicle.getStatus() + ").");
         }
         return vehicle;

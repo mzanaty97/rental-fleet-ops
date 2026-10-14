@@ -26,7 +26,7 @@ public class CheckInView extends JPanel implements PlainScreen {
     public static final String CHECK_IN = "checkIn";
 
     private final JTextField idBox = new JTextField();
-    private final FormField idField = new FormField("Movement ID", false, idBox, null);
+    private final FormField idField = new FormField("Movement ID or plate number", false, idBox, null);
     private final JButton checkInButton = new JButton("Check in");
     private final FormCard result = new FormCard(640, 0);
     private final JLabel banner = new JLabel();
