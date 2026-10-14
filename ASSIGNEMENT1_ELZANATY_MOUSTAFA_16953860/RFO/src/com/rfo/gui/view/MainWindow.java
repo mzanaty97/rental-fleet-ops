@@ -76,6 +76,16 @@ public class MainWindow extends JFrame {
         tabs.setSelectedIndex(index);
     }
 
+    /**
+     * Marks a login tab as locked (too many wrong passwords).
+     */
+    public void markTabLocked(Component content) {
+        int index = tabs.indexOfComponent(content);
+        if (index >= 0 && tabs.getTabComponentAt(index) instanceof TabTitle) {
+            ((TabTitle) tabs.getTabComponentAt(index)).markLocked();
+        }
+    }
+
     private static String initial(String name) {
         return name == null || name.isEmpty() ? "" : name.substring(0, 1).toUpperCase();
     }

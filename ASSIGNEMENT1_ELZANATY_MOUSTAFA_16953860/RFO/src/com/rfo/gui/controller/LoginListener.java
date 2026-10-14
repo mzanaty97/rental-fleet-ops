@@ -11,4 +11,6 @@ public interface LoginListener {
 
     void onLoginSucceeded(LoginView view, Staff staff);
 
+    public void onLoginLocked(LoginView view);
+
 }

@@ -75,7 +75,7 @@ public class RevenueMovementsMenu extends Menu {
             return;
         }
 
-        if (!staff.getAccessibleLocations().contains(staff.getCurrentLocation())) {
+        if (!new com.rfo.service.StaffService(dataStore).canUseLocation(staff, staff.getCurrentLocation())) {
             System.out.println("You do not have access to your current location. Cannot check out a vehicle.");
             return;
         }
@@ -136,10 +136,12 @@ public class RevenueMovementsMenu extends Menu {
             return;
         }
 
-        RentalMovement rental = movementService.startRA(plateNumber, staff.getStaffID(), checkOutLocID,
-                driverIDs, expectedCIDT, expectedCILocID, rsa, insuranceTier);
-
-        if (rental == null) {
+        RentalMovement rental;
+        try {
+            rental = movementService.startRA(plateNumber, staff.getStaffID(), checkOutLocID,
+                    driverIDs, expectedCIDT, expectedCILocID, rsa, insuranceTier);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             System.out.println("Checkout failed. Please check the details above and try again.");
             return;
         }
@@ -151,60 +153,27 @@ public class RevenueMovementsMenu extends Menu {
     }
 
     private void checkin() {
-        if (staff.getCurrentLocation() == null) {
-            System.out.println("You have no current location set. Cannot check in a vehicle.");
-            return;
-        }
-
         System.out.print("Movement ID: ");
         String movementID = scanner.nextLine();
 
-        Movement movement = dataStore.getBy(dataStore.getMovements(),
-                m -> m.getMovementID().equals(movementID));
-
-        if (movement == null) {
-            System.out.println("Movement not found.");
-            return;
+        try {
+            movementService.checkInRental(movementID, staff.getStaffID(), staff.getCurrentLocation());
+            System.out.println("Checked in at " + staff.getCurrentLocation().getName()
+                    + ". Movement status is now: " + MovementStatus.INCOMPLETE);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        if (!(movement instanceof RentalMovement)) {
-            System.out.println("That movement is not a rental.");
-            return;
-        }
-
-        if (movement.getStatus() != MovementStatus.OPEN) {
-            System.out.println("This rental has already been checked in or closed.");
-            return;
-        }
-
-        String checkInLocID = staff.getCurrentLocation().getLocationID();
-
-        movementService.checkIn(movement, staff.getStaffID(), checkInLocID);
-        System.out.println("Checked in at " + staff.getCurrentLocation().getName()
-                + ". Movement status is now: " + movement.getStatus());
     }
 
     private void closeRental() {
         System.out.print("Movement ID: ");
         String movementID = scanner.nextLine();
 
-        Movement movement = dataStore.getBy(dataStore.getMovements(),
-                m -> m.getMovementID().equals(movementID));
-
-        if (movement == null) {
-            System.out.println("Movement not found.");
-            return;
-        }
-
-        if (!(movement instanceof RentalMovement)) {
-            System.out.println("That movement is not a rental.");
-            return;
-        }
-
-        RentalMovement rental = (RentalMovement) movement;
-
-        if (rental.getStatus() != MovementStatus.INCOMPLETE) {
-            System.out.println("This rental must be checked in before it can be closed.");
+        RentalMovement rental;
+        try {
+            rental = movementService.findRentalForClose(movementID);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
@@ -212,9 +181,9 @@ public class RevenueMovementsMenu extends Menu {
         String odoInput = scanner.nextLine();
         int odoIn;
         try {
-            odoIn = Integer.parseInt(odoInput);
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number.");
+            odoIn = movementService.parseOdometer(odoInput, rental.getOdoOut());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
@@ -229,8 +198,12 @@ public class RevenueMovementsMenu extends Menu {
             return;
         }
 
-        movementService.closeRA(rental, odoIn, finalCost);
-        System.out.println("Rental closed. Vehicle status: " + rental.getVehicle().getStatus());
+        try {
+            movementService.closeRA(rental, odoIn, finalCost);
+            System.out.println("Rental closed. Vehicle status: " + rental.getVehicle().getStatus());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     // ---- Shared helpers below (CANCEL-aware retry-until-valid prompts) ----

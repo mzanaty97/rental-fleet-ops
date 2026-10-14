@@ -8,6 +8,7 @@ import com.rfo.service.AuthService;
 import com.rfo.service.DataStore;
 import com.rfo.service.LocationService;
 import com.rfo.service.MenuService;
+import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
 import com.rfo.service.VehicleService;
 import java.awt.Component;
@@ -36,7 +37,8 @@ public class AppController implements ActionListener, LoginListener, SessionList
         this.staffService = staffService;
         this.dataStore = dataStore;
         this.menuService = new MenuService(staffService);
-        this.screenFactory = new ScreenFactory(new VehicleService(dataStore), new LocationService(dataStore));
+        this.screenFactory = new ScreenFactory(new VehicleService(dataStore), new LocationService(dataStore), staffService,
+                new MovementService(dataStore));
         window.getHomeView().addController(this);
     }
 
@@ -56,6 +58,11 @@ public class AppController implements ActionListener, LoginListener, SessionList
         dataStore.addListener(sessionView);
 
         window.replaceTabWithSession(view, sessionView, staff, ev -> closeTab(sessionView));
+    }
+
+    @Override
+    public void onLoginLocked(LoginView view) {
+        window.markTabLocked(view);
     }
 
     // logging out does not close the tab, it goes back to the login form

@@ -1,0 +1,93 @@
+package com.rfo.gui.controller;
+
+import com.rfo.gui.view.CloseRentalView;
+import com.rfo.gui.view.MessageSink;
+import com.rfo.model.RentalMovement;
+import com.rfo.service.MovementService;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**
+ * Controller for Close Rental. Step 1 looks the rental up and checks the
+ * odometer with the MovementService; step 2 shows the final cost and closes the
+ * rental only when the user confirms.
+ */
+public class CloseRentalController implements ActionListener {
+
+    private final CloseRentalView view;
+    private final MovementService movementService;
+    private final MessageSink console;
+    private RentalMovement rental;
+    private int odoIn;
+    private double finalCost;
+
+    public CloseRentalController(CloseRentalView view, MovementService movementService, MessageSink console) {
+        this.view = view;
+        this.movementService = movementService;
+        this.console = console;
+        view.addController(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getActionCommand()) {
+            case CloseRentalView.LOOKUP:
+                lookup();
+                break;
+            case CloseRentalView.CONTINUE:
+                toPayment();
+                break;
+            case CloseRentalView.CONFIRM:
+                close();
+                break;
+            default:
+                console.info("Closing cancelled.");
+                view.reset();
+        }
+    }
+
+    private RentalMovement lookup() {
+        try {
+            RentalMovement r = movementService.findRentalForClose(view.getMovementId());
+            view.showMovementOk(r.getVehicle().getPlateNumber() + " " + r.getVehicle().getMake() + " "
+                    + r.getVehicle().getModel() + " · " + r.getStatus() + " (checked in) · odometer at checkout "
+                    + String.format("%,d", r.getOdoOut()) + " km");
+            return r;
+        } catch (IllegalArgumentException ex) {
+            view.showMovementError(ex.getMessage());
+            return null;
+        }
+    }
+
+    private void toPayment() {
+        RentalMovement r = lookup();
+        if (r == null) {
+            console.error("Check the movement ID first.");
+            return;
+        }
+        try {
+            odoIn = movementService.parseOdometer(view.getOdometerText(), r.getOdoOut());
+        } catch (IllegalArgumentException ex) {
+            view.showOdometerError(ex.getMessage());
+            console.error(ex.getMessage());
+            return;
+        }
+        rental = r;
+        finalCost = movementService.getRentalCost(r);
+        String text = "$" + String.format("%,.2f", finalCost);
+        console.info("Final rental cost: " + text);
+        view.showPayment(r.getMovementID() + " · " + r.getVehicle().getPlateNumber(), r.getOdoOut(), odoIn, text);
+    }
+
+    private void close() {
+        try {
+            movementService.closeRA(rental, odoIn, finalCost);
+            console.ok("Rental closed. Vehicle status: " + rental.getVehicle().getStatus());
+            view.reset();
+        } catch (IllegalArgumentException ex) {
+            // for example it was closed in another tab
+            console.error(ex.getMessage());
+            view.reset();
+        }
+    }
+}

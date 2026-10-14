@@ -24,7 +24,7 @@ public final class Icons {
 
     public enum Type {
         HOME, CLOSE, PIN, CHEVRON_RIGHT, CHEVRON_LEFT, CHEVRON_UP, CHEVRON_DOWN,
-        CHECK_CIRCLE, ERROR_CIRCLE, WARNING, INFO, TERMINAL, LOGOUT, DASHED_CIRCLE, CLOCK, PLUS
+        CHECK_CIRCLE, ERROR_CIRCLE, WARNING, INFO, TERMINAL, LOGOUT, DASHED_CIRCLE, CLOCK, PLUS, LOCK
     }
 
     /**
@@ -106,6 +106,14 @@ public final class Icons {
                 return new Shape[]{new Ellipse2D.Float(3, 3, 14, 14), path("M10 6.5 L10 10 L12.5 12")};
             case PLUS:
                 return new Shape[]{path("M10 4 L10 16 M4 10 L16 10")};
+            case LOCK: {
+                Path2D.Float shackle = new Path2D.Float();
+                shackle.moveTo(7, 9);
+                shackle.lineTo(7, 6);
+                shackle.curveTo(7, 1.5, 13, 1.5, 13, 6);
+                shackle.lineTo(13, 9);
+                return new Shape[]{new RoundRectangle2D.Float(4, 9, 12, 9, 4, 4), shackle};
+            }
             case PIN:
                 Path2D pin = new Path2D.Float();
                 pin.moveTo(10, 18);

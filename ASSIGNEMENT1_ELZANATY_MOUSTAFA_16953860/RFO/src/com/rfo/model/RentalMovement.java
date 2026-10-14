@@ -62,7 +62,7 @@ public class RentalMovement extends DrivenMovement {
         this.rsa = rsa;
     }
 
-    private int getDaysBetween(LocalDateTime start, LocalDateTime end) {
+    private static int getDaysBetween(LocalDateTime start, LocalDateTime end) {
         long hours = ChronoUnit.HOURS.between(start, end);
         int days = (int) (hours / 24);
         long remainder = hours % 24;
@@ -72,7 +72,7 @@ public class RentalMovement extends DrivenMovement {
         return Math.max(days, 1);
     }
 
-    private double getInsuranceBaseRate(int days) {
+    private static double getInsuranceBaseRate(int days) {
         if (days <= 3) {
             return 60.0;
         } else if (days <= 7) {
@@ -96,6 +96,39 @@ public class RentalMovement extends DrivenMovement {
         double insuranceCost = getInsuranceBaseRate(days) * insuranceTier.getRate() * days;
         double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
         return insuranceCost + rsaCost;
+    }
+
+    /**
+     * A price worked out before the rental exists: the days, and what each part
+     * of the price comes to.
+     */
+    public static class Quote {
+
+        public final int days;
+        public final double base;
+        public final double insurance;
+        public final double rsa;
+        public final double total;
+
+        private Quote(int days, double base, double insurance, double rsa) {
+            this.days = days;
+            this.base = base;
+            this.insurance = insurance;
+            this.rsa = rsa;
+            this.total = base + insurance + rsa;
+        }
+    }
+
+    /**
+     * Prices a rental that has not started yet (no equipment), using the same
+     * rules as the real estimate.
+     */
+    public static Quote quote(Vehicle vehicle, LocalDateTime start, LocalDateTime end, boolean rsa, Insurance tier) {
+        int days = getDaysBetween(start, end);
+        double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
+        double insurance = getInsuranceBaseRate(days) * tier.getRate() * days;
+        double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
+        return new Quote(days, base, insurance, rsaCost);
     }
 
     public double getRentalEstimate() {

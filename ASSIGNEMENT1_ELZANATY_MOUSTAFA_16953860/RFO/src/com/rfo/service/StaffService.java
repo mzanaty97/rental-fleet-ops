@@ -33,50 +33,156 @@ public class StaffService {
         return getMenuOptions(role).contains(action);
     }
 
+    /**
+     * Everyone on record, in file order.
+     */
+    public List<Staff> getAllStaff() {
+        return new ArrayList<>(dataStore.getStaff());
+    }
+
+    /**
+     * The staff member with this ID (any letter case), or null.
+     */
+    /**
+     * Everyone whose location access can be changed: managers are left out
+     * because they can use every location.
+     */
+    public List<Staff> getStaffWithAccessRules() {
+        List<Staff> list = new ArrayList<>();
+        for (Staff s : dataStore.getStaff()) {
+            if (s.getRole() != StaffRole.MANAGER) {
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    public Staff findStaff(String staffID) {
+        String wanted = staffID == null ? "" : staffID.trim().toUpperCase();
+        return dataStore.getBy(dataStore.getStaff(), s -> s.getStaffID().equals(wanted));
+    }
+
+    /**
+     * Locations the staff member may work at: a manager can use every active
+     * location, others only the ones granted.
+     */
+    public List<Location> getUsableLocations(Staff staff) {
+        if (staff.getRole() == StaffRole.MANAGER) {
+            return new ArrayList<>(dataStore.getLocations().stream().filter(Location::isActive)
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+        return new ArrayList<>(staff.getAccessibleLocations());
+    }
+
+    public boolean canUseLocation(Staff staff, Location location) {
+        return location != null && getUsableLocations(staff).contains(location);
+    }
+
+    /**
+     * Switches the staff member's working location. Throws with the reason if
+     * it is not allowed.
+     */
     public void switchLocation(Staff staff, Location requested) {
-        if (!staff.getAccessibleLocations().contains(requested)) {
-            System.out.println("Staff does not have access to this location.");
-            return;
+        if (!canUseLocation(staff, requested)) {
+            throw new IllegalArgumentException("Staff does not have access to this location.");
         }
         staff.switchLocation(requested);
         dataStore.saveStaff();
     }
 
+    /**
+     * Adds a staff member after checking every field. Throws with the reason if
+     * anything is wrong.
+     */
     public Staff addStaff(String staffID, String password, String fName, String lName, StaffRole role) {
-        Staff existing = dataStore.getBy(dataStore.getStaff(), s -> s.getStaffID().equals(staffID));
-        if (existing != null) {
-            System.out.println("Duplicate staffID: " + staffID + " already exists.");
-            return null;
+        if (staffID == null || !staffID.matches("[A-Za-z0-9]{1,10}")) {
+            throw new IllegalArgumentException("Staff ID must be letters and digits only, up to 10 characters.");
         }
-        Staff newStaff = new Staff(staffID, fName, lName, role);
+        staffID = staffID.toUpperCase();
+        if (fName == null || fName.trim().isEmpty() || lName == null || lName.trim().isEmpty()) {
+            throw new IllegalArgumentException("First name and last name are required.");
+        }
+        checkPasswordRules(password);
+        if (role == null) {
+            throw new IllegalArgumentException("Please choose a role.");
+        }
+        if (findStaff(staffID) != null) {
+            throw new IllegalArgumentException("Duplicate staffID: " + staffID + " already exists.");
+        }
+        Staff newStaff = new Staff(staffID, fName.trim(), lName.trim(), role);
         dataStore.getStaff().add(newStaff);
         dataStore.addNewStaffLine(newStaff, password);
         return newStaff;
     }
 
+    /**
+     * Changes the password after checking the current one. Throws with the
+     * reason if it is wrong or too weak.
+     */
     public boolean changePassword(Staff staff, String currentPassword, String newPassword) {
         boolean verified = dataStore.authenticate(staff.getStaffID(), currentPassword);
         if (!verified) {
-            System.out.println("Current password is incorrect.");
-            return false;
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+        checkPasswordRules(newPassword);
+        if (newPassword.equals(currentPassword)) {
+            throw new IllegalArgumentException("New password must be different from the current one.");
         }
         return dataStore.updateStaffPassword(staff.getStaffID(), newPassword);
     }
 
+    private void checkPasswordRules(String password) {
+        if (password == null || password.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters.");
+        }
+    }
+
+    /**
+     * Lets the staff member use another location. Throws if they already can.
+     */
     public void grantLocationAccess(Staff target, Location location) {
+        if (target.getRole() == StaffRole.MANAGER) {
+            throw new IllegalArgumentException("Managers can already use every location.");
+        }
         if (target.getAccessibleLocations().contains(location)) {
-            System.out.println("Staff already has access to this location.");
-            return;
+            throw new IllegalArgumentException("Staff already has access to this location.");
         }
         target.getAccessibleLocations().add(location);
         dataStore.saveStaff();
-        System.out.println("Access granted.");
     }
 
+    /**
+     * Removes the chosen locations from the staff member and keeps the rest.
+     * Throws with the reason if nothing can be removed.
+     */
+    public void revokeLocationAccess(Staff target, List<Location> locations) {
+        if (target.getRole() == StaffRole.MANAGER) {
+            throw new IllegalArgumentException("Managers can use every location, so their access cannot be revoked.");
+        }
+        if (locations == null || locations.isEmpty()) {
+            throw new IllegalArgumentException("Choose at least one location to remove.");
+        }
+        for (Location l : locations) {
+            if (!target.getAccessibleLocations().contains(l)) {
+                throw new IllegalArgumentException("Staff does not have access to " + l.getLocationID() + ".");
+            }
+        }
+        target.getAccessibleLocations().removeAll(locations);
+        if (target.getCurrentLocation() != null && locations.contains(target.getCurrentLocation())) {
+            target.switchLocation(null);
+        }
+        dataStore.saveStaff();
+    }
+
+    /**
+     * Removes every location from the staff member. Throws if they have none.
+     */
     public boolean revokeAllLocationAccess(Staff target) {
+        if (target.getRole() == StaffRole.MANAGER) {
+            throw new IllegalArgumentException("Managers can use every location, so their access cannot be revoked.");
+        }
         if (target.getAccessibleLocations().isEmpty() && target.getCurrentLocation() == null) {
-            System.out.println("Staff already has no location access.");
-            return false;
+            throw new IllegalArgumentException("Staff already has no location access.");
         }
         target.getAccessibleLocations().clear();
         target.switchLocation(null);

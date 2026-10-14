@@ -41,7 +41,7 @@ public class AdminMenu extends Menu {
     }
 
     private void changeLocation() {
-        List<Location> access = staff.getAccessibleLocations();
+        List<Location> access = service.getUsableLocations(staff);
         if (access.isEmpty()) {
             System.out.println("You have no accessible locations.");
             return;
@@ -70,8 +70,12 @@ public class AdminMenu extends Menu {
             return;
         }
 
-        service.switchLocation(staff, selected);
-        System.out.println("Location changed to (" + selected.getLocationID() + ") " + selected.getName());
+        try {
+            service.switchLocation(staff, selected);
+            System.out.println("Location changed to (" + selected.getLocationID() + ") " + selected.getName());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void changePassword() {
@@ -89,9 +93,13 @@ public class AdminMenu extends Menu {
             return;
         }
 
-        boolean success = service.changePassword(staff, current, newPass);
-        if (success) {
-            System.out.println("Password changed successfully.");
+        try {
+            boolean success = service.changePassword(staff, current, newPass);
+            if (success) {
+                System.out.println("Password changed successfully.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

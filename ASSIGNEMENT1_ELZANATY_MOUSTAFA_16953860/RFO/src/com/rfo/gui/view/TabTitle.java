@@ -35,10 +35,11 @@ import javax.swing.border.EmptyBorder;
  */
 public class TabTitle extends JPanel {
 
-    private final Color accent;
+    private Color accent;
     private final boolean showCloseAlways;
     private final String baseLabel;
     private final TabLabel label;
+    private IconBox iconBox;
     private final CloseButton close;
 
     public static TabTitle home() {
@@ -70,7 +71,8 @@ public class TabTitle extends JPanel {
         if (initials != null) {
             add(new Avatar(initials, avatarColor, 20, 9f));
         } else {
-            add(new IconBox(icon));
+            iconBox = new IconBox(icon);
+            add(iconBox);
         }
         add(Box.createHorizontalStrut(8));
         label = new TabLabel(text);
@@ -92,6 +94,20 @@ public class TabTitle extends JPanel {
      */
     public String getBaseLabel() {
         return baseLabel;
+    }
+
+    /**
+     * After five wrong passwords: a red stripe, a lock in a pink circle and the
+     * word "Locked".
+     */
+    public void markLocked() {
+        accent = Theme.ERR_FG;
+        if (iconBox != null) {
+            iconBox.locked = true;
+        }
+        label.setText("Locked");
+        revalidate();
+        repaint();
     }
 
     public void setTitle(String title) {
@@ -176,6 +192,7 @@ public class TabTitle extends JPanel {
     private class IconBox extends JComponent {
 
         private final Icons.Type type;
+        private boolean locked;
 
         IconBox(Icons.Type type) {
             this.type = type;
@@ -194,6 +211,15 @@ public class TabTitle extends JPanel {
 
         @Override
         protected void paintComponent(Graphics g) {
+            if (locked) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Theme.ERR_BG);
+                g2.fillOval(0, (getHeight() - 16) / 2, 16, 16);
+                Icons.paint(g2, Icons.Type.LOCK, 3, (getHeight() - 10) / 2, 10, Theme.ERR_FG, 2.6f);
+                g2.dispose();
+                return;
+            }
             Icons.paint((Graphics2D) g, type, 0, (getHeight() - 16) / 2, 16, isSelectedTab() ? Theme.TEXT_PRIMARY : Theme.TEXT_ON_NAVY, 2f);
         }
     }

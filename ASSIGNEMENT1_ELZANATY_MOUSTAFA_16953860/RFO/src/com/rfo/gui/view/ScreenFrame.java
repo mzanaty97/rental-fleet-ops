@@ -90,9 +90,28 @@ public class ScreenFrame extends JPanel {
         c.weightx = 1;
         bar.add(Box.createHorizontalGlue(), c);
 
+        // a screen can ask to go back to the menu (for example "Back to menu" after a checkout)
+        content.putClientProperty("goBack", (Runnable) this::goBack);
         add(bar, BorderLayout.NORTH);
         if (content instanceof PlaceholderView) {
             add(content, BorderLayout.CENTER);
+        } else if (content instanceof FullScreen) {
+            // the screen draws its own cards and stretches with the window
+            JPanel wrap = new JPanel(new BorderLayout());
+            wrap.setOpaque(false);
+            wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
+            wrap.add(content, BorderLayout.CENTER);
+            add(wrap, BorderLayout.CENTER);
+        } else if (content instanceof PlainScreen) {
+            // the screen draws its own cards: put it at the top left, at its own size
+            JPanel holder = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+            holder.setOpaque(false);
+            holder.add(content);
+            JPanel wrap = new JPanel(new BorderLayout());
+            wrap.setOpaque(false);
+            wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
+            wrap.add(holder, BorderLayout.NORTH);
+            add(wrap, BorderLayout.CENTER);
         } else {
             JPanel card = new JPanel(new BorderLayout());
             card.setBackground(Theme.BG_SURFACE);

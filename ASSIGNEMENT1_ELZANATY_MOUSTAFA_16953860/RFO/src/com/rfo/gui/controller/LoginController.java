@@ -32,7 +32,7 @@ public class LoginController implements ActionListener {
 
         // input validation
         if (staffId.isEmpty() || password.isEmpty()) {
-            view.showError("Please enter both your Staff ID and password.");
+            view.showMissing(staffId.isEmpty(), password.isEmpty(), "Please enter both your Staff ID and password.");
             return;
         }
 
@@ -41,11 +41,12 @@ public class LoginController implements ActionListener {
         if (staff == null) {
             attempts++;
             view.clearPassword();
+            view.showAttempts(attempts, MAX_ATTEMPTS);
             if (attempts >= MAX_ATTEMPTS) {
-                view.lockForm("Too many failed attempts. Close this tab and start a new session.");
+                view.lockForm("Too many failed attempts. Login locked.");
+                listener.onLoginLocked(view);
             } else {
-                view.showError("Incorrect Staff ID or password. Attempts remaining: "
-                        + (MAX_ATTEMPTS - attempts));
+                view.showWrongLogin("Staff ID or password is incorrect.", "Invalid staff ID or password.");
             }
             return;
         }
