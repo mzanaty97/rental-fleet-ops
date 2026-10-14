@@ -12,6 +12,7 @@ import com.rfo.model.Movement;
 import com.rfo.model.Staff;
 import com.rfo.model.Vehicle;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -29,6 +30,8 @@ public class DataStore {
     private final StaffDAO staffDAO = new StaffDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
+    private final List<ModelListener> listeners = new CopyOnWriteArrayList<>();
+
     public DataStore() {
         // first run only: copy the Part 1 text files into an empty database
         new DatabaseSeeder().seedIfEmpty();
@@ -40,9 +43,24 @@ public class DataStore {
         this.staff = staffDAO.loadAll(locations);
         this.movements = movementDAO.loadAll(vehicles, locations);
     }
+    
+        public void addListener(ModelListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(ModelListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyListeners() {
+        for (ModelListener listener : listeners) {
+            listener.onModelChanged();
+        }
+    }
 
     public void saveLocations() {
         locationDAO.saveAll(locations);
+        notifyListeners();
     }
 
     public List<Location> getLocations() {
@@ -51,6 +69,7 @@ public class DataStore {
 
     public void saveDrivers() {
         driverDAO.saveAll(drivers);
+        notifyListeners();
     }
 
     public List<Driver> getDrivers() {
@@ -59,6 +78,7 @@ public class DataStore {
 
     public void saveVehicles() {
         vehicleDAO.saveAll(vehicles);
+        notifyListeners();
     }
 
     public List<Vehicle> getVehicles() {
@@ -67,6 +87,7 @@ public class DataStore {
 
     public void saveStaff() {
         staffDAO.saveAll(staff);
+        notifyListeners();
     }
 
     public List<Staff> getStaff() {
@@ -75,6 +96,7 @@ public class DataStore {
 
     public void saveMovements() {
         movementDAO.saveAll(movements);
+        notifyListeners();
     }
 
     public List<Movement> getMovements() {
