@@ -6,17 +6,19 @@ import com.rfo.model.VehicleCategory;
 import com.rfo.model.VehicleStatus;
 import com.rfo.service.DataStore;
 import com.rfo.service.StaffService;
-import java.util.Comparator;
+import com.rfo.service.VehicleService;
 import java.util.List;
 import java.util.Scanner;
 
 public class FleetMenu extends Menu {
 
     private StaffService staffService;
+    private VehicleService vehicleService;
 
     public FleetMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
         this.staffService = new StaffService(dataStore);
+        this.vehicleService = new VehicleService(dataStore);
     }
 
     @Override
@@ -50,28 +52,12 @@ public class FleetMenu extends Menu {
     private void queryAvailableVehicles() {
         VehicleCategory filter = promptForModeAndCategory();
 
-        List<Vehicle> available = dataStore.search(dataStore.getVehicles(), Vehicle::isAvailable);
-
-        if (filter != null) {
-            available = dataStore.search(available, v -> v.getCategory() == filter);
-        }
+        List<Vehicle> available = vehicleService.getAvailableVehicles(filter);
 
         if (available.isEmpty()) {
             System.out.println("No Vehicles Available!");
             return;
         }
-
-        Comparator<Vehicle> comparator;
-        if (filter == null) {
-            comparator = Comparator.comparing(Vehicle::getCategory)
-                    .thenComparingInt(Vehicle::getCurrentOdometer)
-                    .thenComparing(Vehicle::getPlateNumber);
-        } else {
-            comparator = Comparator.comparingInt(Vehicle::getCurrentOdometer)
-                    .thenComparing(Vehicle::getPlateNumber);
-        }
-
-        available.sort(comparator);
 
         System.out.println("\n--- Available Vehicles ---");
         for (Vehicle v : available) {
@@ -82,7 +68,7 @@ public class FleetMenu extends Menu {
     }
 
     private void queryServiceDueVehicles() {
-        List<Vehicle> due = dataStore.search(dataStore.getVehicles(), Vehicle::isDueForService);
+        List<Vehicle> due = vehicleService.getServiceDueVehicles(null);
 
         if (due.isEmpty()) {
             System.out.println("No due for service vehicles.");
@@ -115,14 +101,15 @@ public class FleetMenu extends Menu {
             return;
         }
 
-        if (vehicle.getStatus().equals(newStatus)) {
-            System.out.println("No change done.");
-            return;
+        try {
+            if (vehicleService.updateVehicleStatus(input, newStatus)) {
+                System.out.println("Status changed to: " + newStatus);
+            } else {
+                System.out.println("No change done.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        vehicle.updateStatus(newStatus);
-        dataStore.saveVehicles();
-        System.out.println("Status changed to: " + newStatus);
     }
 
     private VehicleCategory promptForModeAndCategory() {
