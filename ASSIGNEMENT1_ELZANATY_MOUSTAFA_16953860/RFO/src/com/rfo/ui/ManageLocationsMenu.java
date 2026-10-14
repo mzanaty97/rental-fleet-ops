@@ -90,21 +90,20 @@ public class ManageLocationsMenu extends Menu {
         String postalCode = scanner.nextLine();
 
         Address address = new Address(street, city, country, postalCode);
-        Location location = service.addLocation(locationID, name, address);
 
-        if (location == null) {
-            System.out.println("Failed to add location. See message above.");
-            return;
+        try {
+            Location location = service.addLocation(locationID, name, address);
+            System.out.println("Location added successfully: " + location.getLocationID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("Location added successfully: " + location.getLocationID());
     }
 
     private void closeLocation() {
         System.out.print("Location ID to close: ");
         String locationID = scanner.nextLine().trim().toUpperCase();
 
-        Location location = dataStore.getBy(dataStore.getLocations(), l -> l.getLocationID().equals(locationID));
+        Location location = service.findLocation(locationID);
 
         if (location == null) {
             System.out.println("Location not found.");
@@ -114,10 +113,11 @@ public class ManageLocationsMenu extends Menu {
         System.out.print("Destination location ID for any vehicles there: ");
         String newLocationID = scanner.nextLine().trim().toUpperCase();
 
-        boolean closed = service.closeLocation(location, newLocationID, staff.getStaffID());
-
-        if (closed) {
+        try {
+            service.closeLocation(location, newLocationID, staff.getStaffID());
             System.out.println("Location closed: " + location.getLocationID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

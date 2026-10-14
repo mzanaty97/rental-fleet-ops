@@ -1,6 +1,7 @@
 package com.rfo.gui.controller;
 
 import com.rfo.gui.view.FleetView;
+import com.rfo.gui.view.MessageSink;
 import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleStatus;
 import com.rfo.service.ModelListener;
@@ -18,10 +19,12 @@ public class FleetController implements ActionListener, ModelListener {
 
     private final FleetView view;
     private final VehicleService vehicleService;
+    private final MessageSink console;
 
-    public FleetController(FleetView view, VehicleService vehicleService) {
+    public FleetController(FleetView view, VehicleService vehicleService, MessageSink console) {
         this.view = view;
         this.vehicleService = vehicleService;
+        this.console = console;
         view.setStatusOptions(vehicleService.getManualStatuses());
         view.addController(this);
         refresh();
@@ -32,7 +35,6 @@ public class FleetController implements ActionListener, ModelListener {
         if (FleetView.APPLY_COMMAND.equals(e.getActionCommand())) {
             applyStatus();
         } else {
-            view.clearMessage();
             refresh();
         }
     }
@@ -62,7 +64,7 @@ public class FleetController implements ActionListener, ModelListener {
         VehicleStatus newStatus = view.getSelectedStatus();
 
         if (plate == null) {
-            view.showError("Select a vehicle in the table first.");
+            console.print("Select a vehicle in the table first.");
             return;
         }
 
@@ -70,12 +72,12 @@ public class FleetController implements ActionListener, ModelListener {
             boolean changed = vehicleService.updateVehicleStatus(plate, newStatus);
             // saving already refreshed the table through onModelChanged
             if (changed) {
-                view.showMessage(plate + " is now " + newStatus + ".");
+                console.print(plate + " is now " + newStatus + ".");
             } else {
-                view.showError(plate + " is already " + newStatus + ". No change made.");
+                console.print(plate + " is already " + newStatus + ". No change made.");
             }
         } catch (IllegalArgumentException ex) {
-            view.showError(ex.getMessage());
+            console.print(ex.getMessage());
         }
     }
 }

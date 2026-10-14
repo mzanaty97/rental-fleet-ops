@@ -72,7 +72,6 @@ public class FleetView extends JPanel {
     private final JTable table = new JTable(tableModel);
     private final JComboBox<VehicleStatus> statusBox = new JComboBox<>();
     private final JButton applyButton = new JButton("Apply status");
-    private final JLabel messageLabel = new JLabel(" ");
 
     /**
      * @param mode which vehicles this screen shows
@@ -137,7 +136,6 @@ public class FleetView extends JPanel {
             bar.add(statusBox);
             bar.add(applyButton);
         }
-        bar.add(messageLabel);
         return bar;
     }
 
@@ -200,20 +198,6 @@ public class FleetView extends JPanel {
 
     public VehicleStatus getSelectedStatus() {
         return (VehicleStatus) statusBox.getSelectedItem();
-    }
-
-    public void showMessage(String text) {
-        messageLabel.setForeground(new Color(0x1B7F3B));
-        messageLabel.setText(text);
-    }
-
-    public void showError(String text) {
-        messageLabel.setForeground(Color.RED);
-        messageLabel.setText(text);
-    }
-
-    public void clearMessage() {
-        messageLabel.setText(" ");
     }
 
     public void addController(ActionListener controller) {

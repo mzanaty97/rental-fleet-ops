@@ -77,11 +77,10 @@ public class LoginView extends JPanel {
         add(card);
     }
 
-    // button click or pressing Enter in either field all count as "log in"
     public void addController(ActionListener controller) {
         loginButton.addActionListener(controller);
-        staffIdField.addActionListener(controller);
         passwordField.addActionListener(controller);
+        staffIdField.addActionListener(e -> passwordField.requestFocusInWindow());
     }
 
     public String getStaffId() {

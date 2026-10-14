@@ -18,14 +18,16 @@ import javax.swing.JPanel;
 /**
  * One logged-in session (one tab). A header shows who is logged in, and below
  * it one screen at a time: the main menu, a sub menu or a feature screen. The
- * navigation controller adds the screens and decides which one is showing.
- * Listens to the model so screens can refresh when data changes.
+ * navigation controller adds the screens and decides which one is showing. A
+ * small console box at the bottom shows the messages the screens print. Listens
+ * to the model so screens can refresh when data changes.
  */
 public class SessionView extends JPanel implements ModelListener {
 
     private final JButton logoutButton = new JButton("Log out");
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cards = new JPanel(cardLayout);
+    private final ConsoleView console = new ConsoleView();
     private final List<ModelListener> screenListeners = new ArrayList<>();
 
     public SessionView(Staff staff) {
@@ -35,6 +37,7 @@ public class SessionView extends JPanel implements ModelListener {
 
         add(buildHeader(staff), BorderLayout.NORTH);
         add(cards, BorderLayout.CENTER);
+        add(console, BorderLayout.SOUTH);
     }
 
     private JPanel buildHeader(Staff staff) {
@@ -55,6 +58,13 @@ public class SessionView extends JPanel implements ModelListener {
     }
 
     /**
+     * Where screens print their messages.
+     */
+    public MessageSink getConsole() {
+        return console;
+    }
+
+    /**
      * Registers a screen under a key so it can be shown later.
      */
     public void addScreen(String key, JComponent screen) {
@@ -63,6 +73,12 @@ public class SessionView extends JPanel implements ModelListener {
 
     public void showScreen(String key) {
         cardLayout.show(cards, key);
+        // put the focus on the screen now showing so the keyboard shortcuts reach it
+        for (java.awt.Component screen : cards.getComponents()) {
+            if (screen.isVisible()) {
+                screen.requestFocusInWindow();
+            }
+        }
     }
 
     /**

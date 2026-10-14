@@ -3,6 +3,7 @@ package com.rfo.gui.controller;
 import com.rfo.gui.view.MenuView;
 import com.rfo.gui.view.ScreenFrame;
 import com.rfo.gui.view.SessionView;
+import com.rfo.model.Staff;
 import com.rfo.service.MenuNode;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,12 @@ public class NavigationController {
 
     private final SessionView sessionView;
     private final ScreenFactory screenFactory;
+    private final Staff staff;
 
-    public NavigationController(SessionView sessionView, MenuNode root, ScreenFactory screenFactory) {
+    public NavigationController(SessionView sessionView, MenuNode root, ScreenFactory screenFactory, Staff staff) {
         this.sessionView = sessionView;
         this.screenFactory = screenFactory;
+        this.staff = staff;
 
         addMenu(root, root.getLabel(), null);
         sessionView.showScreen(root.getLabel());
@@ -35,6 +38,7 @@ public class NavigationController {
         }
 
         MenuView menu = new MenuView(node.getLabel(), labels, parentKey != null);
+        menu.setMessageSink(sessionView.getConsole());
         menu.addController(e -> {
             String command = e.getActionCommand();
             sessionView.showScreen(MenuView.BACK.equals(command) ? parentKey : key + "/" + command);
@@ -52,7 +56,7 @@ public class NavigationController {
     }
 
     private void addFeature(String option, String key, String parentKey) {
-        JComponent content = screenFactory.createScreen(option, sessionView);
+        JComponent content = screenFactory.createScreen(option, sessionView, staff);
         ScreenFrame frame = new ScreenFrame(option, content);
         frame.addController(e -> sessionView.showScreen(parentKey));
         sessionView.addScreen(key, frame);

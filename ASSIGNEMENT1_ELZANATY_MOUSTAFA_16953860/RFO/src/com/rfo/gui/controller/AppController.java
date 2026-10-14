@@ -6,6 +6,7 @@ import com.rfo.gui.view.SessionView;
 import com.rfo.model.Staff;
 import com.rfo.service.AuthService;
 import com.rfo.service.DataStore;
+import com.rfo.service.LocationService;
 import com.rfo.service.MenuService;
 import com.rfo.service.StaffService;
 import com.rfo.service.VehicleService;
@@ -35,7 +36,7 @@ public class AppController implements ActionListener, LoginListener, SessionList
         this.staffService = staffService;
         this.dataStore = dataStore;
         this.menuService = new MenuService(staffService);
-        this.screenFactory = new ScreenFactory(new VehicleService(dataStore));
+        this.screenFactory = new ScreenFactory(new VehicleService(dataStore), new LocationService(dataStore));
         window.getHomeView().addController(this);
     }
 
@@ -51,7 +52,7 @@ public class AppController implements ActionListener, LoginListener, SessionList
     public void onLoginSucceeded(LoginView view, Staff staff) {
         SessionView sessionView = new SessionView(staff);
         sessionView.addController(new SessionController(sessionView, this));
-        new NavigationController(sessionView, menuService.getMenuFor(staff.getRole()), screenFactory);
+        new NavigationController(sessionView, menuService.getMenuFor(staff.getRole()), screenFactory, staff);
         dataStore.addListener(sessionView);
 
         window.replaceTab(view, sessionView, staff.getFName() + " (" + staff.getStaffID() + ")",

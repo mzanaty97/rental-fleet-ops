@@ -6,10 +6,15 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 /**
  * Startup tab: the app name and a button to start a new session.
@@ -46,6 +51,25 @@ public class HomeView extends JPanel {
         c.gridy = 2;
         c.insets = new Insets(0, 0, 0, 0);
         add(newSessionButton, c);
+
+        JLabel hint = new JLabel("or press Enter");
+        hint.setForeground(Color.GRAY);
+        c.gridy = 3;
+        c.insets = new Insets(10, 0, 0, 0);
+        add(hint, c);
+
+        installEnterKey();
+    }
+
+    // Enter starts a session whenever the Home tab is the one showing
+    private void installEnterKey() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "newSession");
+        getActionMap().put("newSession", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newSessionButton.doClick();
+            }
+        });
     }
 
     public void addController(ActionListener controller) {
