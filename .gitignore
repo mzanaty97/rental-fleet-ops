@@ -1,23 +1,23 @@
-# Compiled class files
-RFO/build/*.class
+# NetBeans / Ant build output
+**/build/
+**/dist/
+**/nbbuild/
+**/nbdist/
+**/nbproject/private/
+*.class
 
-# NetBeans build/output directories
-RFO/build/
-RFO/dist/
-RFO/nbbuild/
-RFO/nbdist/
-
-# NetBeans private project settings (machine-specific)
-RFO/nbproject/private/
-
-# Log files
+# Archives and logs
+*.zip
 *.log
+derby.log
 
-# OS-specific junk
+# Derby database folder (anchored, so the com.rfo.db code package is not ignored)
+/ASSIGNEMENT1_ELZANATY_MOUSTAFA_16953860/RFO/db/
+
+# OS and editor junk
 .DS_Store
 Thumbs.db
-
-# IDE files (in case you also open it elsewhere)
+.Rhistory
 .vscode/
 .idea/
 *.iml
