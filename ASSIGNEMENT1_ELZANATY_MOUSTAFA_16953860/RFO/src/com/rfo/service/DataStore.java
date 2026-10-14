@@ -1,10 +1,11 @@
 package com.rfo.service;
 
-import com.rfo.io.DriverFileHandler;
-import com.rfo.io.LocationFileHandler;
-import com.rfo.io.MovementFileHandler;
-import com.rfo.io.StaffFileHandler;
-import com.rfo.io.VehicleFileHandler;
+import com.rfo.db.DatabaseSeeder;
+import com.rfo.io.DriverDAO;
+import com.rfo.io.LocationDAO;
+import com.rfo.io.MovementDAO;
+import com.rfo.io.StaffDAO;
+import com.rfo.io.VehicleDAO;
 import com.rfo.model.Driver;
 import com.rfo.model.Location;
 import com.rfo.model.Movement;
@@ -22,24 +23,26 @@ public class DataStore {
     private List<Staff> staff = new ArrayList<>();
     private List<Vehicle> vehicles = new ArrayList<>();
 
-    private final LocationFileHandler locationFileHandler = new LocationFileHandler();
-    private final DriverFileHandler driverFileHandler = new DriverFileHandler();
-    private final MovementFileHandler movementFileHandler = new MovementFileHandler();
-    private final StaffFileHandler staffFileHandler = new StaffFileHandler();
-    private final VehicleFileHandler vehicleFileHandler = new VehicleFileHandler();
+    private final LocationDAO locationDAO = new LocationDAO();
+    private final DriverDAO driverDAO = new DriverDAO();
+    private final MovementDAO movementDAO = new MovementDAO();
+    private final StaffDAO staffDAO = new StaffDAO();
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
 
     public DataStore() {
-        // loading in order Locations -> drivers -> vehicles -> staff -> movements
+        // first run only: copy the Part 1 text files into an empty database
+        new DatabaseSeeder().seedIfEmpty();
 
-        this.locations = locationFileHandler.loadAll();
-        this.drivers = driverFileHandler.loadAll();
-        this.vehicles = vehicleFileHandler.loadAll(locations);
-        this.staff = staffFileHandler.loadAll(locations);
-        this.movements = movementFileHandler.loadAll(vehicles, locations);
+        // loading in order Locations -> drivers -> vehicles -> staff -> movements
+        this.locations = locationDAO.loadAll();
+        this.drivers = driverDAO.loadAll();
+        this.vehicles = vehicleDAO.loadAll(locations);
+        this.staff = staffDAO.loadAll(locations);
+        this.movements = movementDAO.loadAll(vehicles, locations);
     }
 
     public void saveLocations() {
-        locationFileHandler.saveAll(locations);
+        locationDAO.saveAll(locations);
     }
 
     public List<Location> getLocations() {
@@ -47,7 +50,7 @@ public class DataStore {
     }
 
     public void saveDrivers() {
-        driverFileHandler.saveAll(drivers);
+        driverDAO.saveAll(drivers);
     }
 
     public List<Driver> getDrivers() {
@@ -55,7 +58,7 @@ public class DataStore {
     }
 
     public void saveVehicles() {
-        vehicleFileHandler.saveAll(vehicles);
+        vehicleDAO.saveAll(vehicles);
     }
 
     public List<Vehicle> getVehicles() {
@@ -63,7 +66,7 @@ public class DataStore {
     }
 
     public void saveStaff() {
-        staffFileHandler.saveAll(staff);
+        staffDAO.saveAll(staff);
     }
 
     public List<Staff> getStaff() {
@@ -71,7 +74,7 @@ public class DataStore {
     }
 
     public void saveMovements() {
-        movementFileHandler.saveAll(movements);
+        movementDAO.saveAll(movements);
     }
 
     public List<Movement> getMovements() {
@@ -98,14 +101,14 @@ public class DataStore {
     }
 
     public boolean authenticate(String staffId, String passwrod) {
-        return staffFileHandler.authenticate(staffId, passwrod);
+        return staffDAO.authenticate(staffId, passwrod);
     }
 
     public void addNewStaffLine(Staff newStaff, String password) {
-        staffFileHandler.addNewStaffLine(newStaff, password);
+        staffDAO.addNewStaffLine(newStaff, password);
     }
 
     public boolean updateStaffPassword(String staffID, String newPassword) {
-        return staffFileHandler.updatePassword(staffID, newPassword);
+        return staffDAO.updatePassword(staffID, newPassword);
     }
 }
