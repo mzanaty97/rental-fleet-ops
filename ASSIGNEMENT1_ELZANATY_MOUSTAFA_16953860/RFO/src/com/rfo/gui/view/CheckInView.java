@@ -17,9 +17,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- * The Check In screen: type a movement ID, press Check in, and a result card
- * shows where the rental stands (OPEN to INCOMPLETE) with its times. It checks
- * the rental in at the staff member's current location.
+ * The Check In screen (rentals, car transfers and workshop jobs): type a
+ * movement ID or plate, press Check in, and a result card shows where the
+ * rental stands (OPEN to INCOMPLETE) with its times. It checks the rental in at
+ * the staff member's current location.
  */
 public class CheckInView extends JPanel implements PlainScreen {
 
@@ -31,6 +32,7 @@ public class CheckInView extends JPanel implements PlainScreen {
     private final FormCard result = new FormCard(640, 0);
     private final JLabel banner = new JLabel();
     private final JLabel title = new JLabel();
+    private final JLabel next = new JLabel();
     private final JLabel[] times = {new JLabel(), new JLabel(), new JLabel()};
 
     public CheckInView() {
@@ -97,7 +99,7 @@ public class CheckInView extends JPanel implements PlainScreen {
         JPanel steps = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
         steps.setOpaque(false);
         steps.add(new StatusStepper(1, false));
-        JLabel next = new JLabel("   Next: Close Rental to take payment");
+        next.setText("   Next: Close Rental to take payment");
         next.setFont(Theme.F_SMALL);
         next.setForeground(Theme.TEXT_SECONDARY);
         steps.add(next);
@@ -160,10 +162,11 @@ public class CheckInView extends JPanel implements PlainScreen {
     /**
      * Shows the result card. The times are already formatted text.
      */
-    public void showResult(String locationName, String movementId, String plate, String carName,
+    public void showResult(String locationName, String kind, String movementId, String plate, String carName,
             String checkedOut, String checkedIn, String expected) {
         idField.clearError();
-        banner.setText("Checked in at " + locationName);
+        banner.setText(kind + " checked in at " + locationName);
+        next.setText(kind.equals("Rental") ? "   Next: Close Rental to take payment" : "   Next: Close Rental to finish this " + kind.toLowerCase());
         title.setText("<html>Movement " + movementId + " · <span style='font-family:monospace'>" + plate
                 + "</span> " + carName + "</html>");
         times[0].setText(checkedOut);

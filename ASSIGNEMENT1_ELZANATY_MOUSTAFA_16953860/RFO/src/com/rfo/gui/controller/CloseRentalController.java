@@ -2,6 +2,7 @@ package com.rfo.gui.controller;
 
 import com.rfo.gui.view.CloseRentalView;
 import com.rfo.gui.view.MessageSink;
+import com.rfo.model.DrivenMovement;
 import com.rfo.model.RentalMovement;
 import com.rfo.service.MovementService;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,7 @@ public class CloseRentalController implements ActionListener {
     private final CloseRentalView view;
     private final MovementService movementService;
     private final MessageSink console;
-    private RentalMovement rental;
+    private DrivenMovement rental;
     private int odoIn;
     private double finalCost;
 
@@ -46,10 +47,10 @@ public class CloseRentalController implements ActionListener {
         }
     }
 
-    private RentalMovement lookup() {
+    private DrivenMovement lookup() {
         try {
-            RentalMovement r = movementService.findRentalForClose(view.getMovementId());
-            view.showMovementOk(r.getVehicle().getPlateNumber() + " " + r.getVehicle().getMake() + " "
+            DrivenMovement r = movementService.findMovementForClose(view.getMovementId());
+            view.showMovementOk(movementService.kindOf(r) + " · " + r.getVehicle().getPlateNumber() + " " + r.getVehicle().getMake() + " "
                     + r.getVehicle().getModel() + " · " + r.getStatus() + " (checked in) · odometer at checkout "
                     + String.format("%,d", r.getOdoOut()) + " km");
             return r;
@@ -60,7 +61,7 @@ public class CloseRentalController implements ActionListener {
     }
 
     private void toPayment() {
-        RentalMovement r = lookup();
+        DrivenMovement r = lookup();
         if (r == null) {
             console.error("Check the movement ID or plate number first.");
             return;
@@ -73,16 +74,27 @@ public class CloseRentalController implements ActionListener {
             return;
         }
         rental = r;
-        finalCost = movementService.getRentalCost(r);
-        String text = "$" + String.format("%,.2f", finalCost);
-        console.info("Final rental cost: " + text);
-        view.showPayment(r.getMovementID() + " · " + r.getVehicle().getPlateNumber(), r.getOdoOut(), odoIn, text);
+        boolean isRental = r instanceof RentalMovement;
+        String text = "No charge";
+        if (isRental) {
+            finalCost = movementService.getRentalCost((RentalMovement) r);
+            text = "$" + String.format("%,.2f", finalCost);
+            console.info("Final rental cost: " + text);
+        } else {
+            console.info("No charge for a " + movementService.kindOf(r).toLowerCase() + ". Confirm to close it.");
+        }
+        view.showPayment(r.getMovementID() + " · " + r.getVehicle().getPlateNumber(), r.getOdoOut(), odoIn, text,
+                isRental);
     }
 
     private void close() {
         try {
-            movementService.closeRA(rental, odoIn, finalCost);
-            console.ok("Rental closed. Vehicle status: " + rental.getVehicle().getStatus());
+            if (rental instanceof RentalMovement) {
+                movementService.closeRA((RentalMovement) rental, odoIn, finalCost);
+            } else {
+                movementService.closeDrivenMovement(rental, odoIn);
+            }
+            console.ok(movementService.kindOf(rental) + " closed. Vehicle status: " + rental.getVehicle().getStatus());
             view.reset();
         } catch (IllegalArgumentException ex) {
             // for example it was closed in another tab

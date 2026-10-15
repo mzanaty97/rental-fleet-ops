@@ -168,71 +168,88 @@ public class MovementService {
     }
 
     /**
-     * Finds a rental that is OPEN and can be checked in. The text can be a
-     * movement ID or a plate number; a plate finds that vehicle's open rental.
-     * Throws with the reason if not.
+     * Finds a movement that is OPEN and can be checked in: a rental, a car
+     * transfer or a workshop job. The text can be a movement ID or a plate
+     * number; a plate finds that vehicle's open movement. Throws with the
+     * reason if not.
      */
-    public RentalMovement findRentalForCheckIn(String idOrPlate) {
-        RentalMovement rental = findRental(idOrPlate, MovementStatus.OPEN, "checked in");
-        if (rental.getStatus() != MovementStatus.OPEN) {
-            throw new IllegalArgumentException("This rental has already been checked in or closed.");
+    public DrivenMovement findMovementForCheckIn(String idOrPlate) {
+        DrivenMovement movement = findDriven(idOrPlate, MovementStatus.OPEN, "checked in");
+        if (movement.getStatus() != MovementStatus.OPEN) {
+            throw new IllegalArgumentException("This movement has already been checked in or closed.");
         }
-        return rental;
+        return movement;
     }
 
     /**
-     * Finds a rental that has been checked in and can be closed. The text can
-     * be a movement ID or a plate number; a plate finds that vehicle's
-     * checked-in rental. Throws with the reason if not.
+     * Finds a movement that has been checked in and can be closed (rental, car
+     * transfer or workshop job). The text can be a movement ID or a plate
+     * number. Throws with the reason if not.
      */
-    public RentalMovement findRentalForClose(String idOrPlate) {
-        RentalMovement rental = findRental(idOrPlate, MovementStatus.INCOMPLETE, "closed");
-        if (rental.getStatus() != MovementStatus.INCOMPLETE) {
-            throw new IllegalArgumentException("This rental must be checked in before it can be closed.");
+    public DrivenMovement findMovementForClose(String idOrPlate) {
+        DrivenMovement movement = findDriven(idOrPlate, MovementStatus.INCOMPLETE, "closed");
+        if (movement.getStatus() != MovementStatus.INCOMPLETE) {
+            throw new IllegalArgumentException("This movement must be checked in before it can be closed.");
         }
-        return rental;
+        return movement;
     }
 
     /**
-     * Looks for a movement with this ID first, then for the rental of a vehicle
-     * with this plate in the wanted status.
+     * A short name for the kind of movement, for screens and messages.
      */
-    private RentalMovement findRental(String idOrPlate, MovementStatus wanted, String action) {
+    public String kindOf(Movement movement) {
+        if (movement instanceof RentalMovement) {
+            return "Rental";
+        }
+        if (movement instanceof CarTransferMovement) {
+            return "Car transfer";
+        }
+        if (movement instanceof WorkshopMovement) {
+            return "Workshop";
+        }
+        return "Movement";
+    }
+
+    /**
+     * Looks for a movement with this ID first, then for a movement of the
+     * vehicle with this plate in the wanted status.
+     */
+    private DrivenMovement findDriven(String idOrPlate, MovementStatus wanted, String action) {
         String text = idOrPlate == null ? "" : idOrPlate.trim();
         if (text.isEmpty()) {
             throw new IllegalArgumentException("Enter a movement ID or a plate number.");
         }
         Movement movement = dataStore.getBy(dataStore.getMovements(), m -> m.getMovementID().equals(text));
         if (movement != null) {
-            if (!(movement instanceof RentalMovement)) {
-                throw new IllegalArgumentException("That movement is not a rental.");
+            if (!(movement instanceof DrivenMovement)) {
+                throw new IllegalArgumentException("That movement cannot be checked in or closed.");
             }
-            return (RentalMovement) movement;
+            return (DrivenMovement) movement;
         }
         String plate = text.toUpperCase();
-        List<Movement> mine = dataStore.search(dataStore.getMovements(), m -> m instanceof RentalMovement
+        List<Movement> mine = dataStore.search(dataStore.getMovements(), m -> m instanceof DrivenMovement
                 && m.getVehicle().getPlateNumber().equals(plate) && m.getStatus() == wanted);
         if (!mine.isEmpty()) {
-            return (RentalMovement) mine.get(mine.size() - 1);
+            return (DrivenMovement) mine.get(mine.size() - 1);
         }
         boolean knownPlate = dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate)) != null;
         if (knownPlate) {
-            throw new IllegalArgumentException("There is no rental for " + plate + " that can be " + action + ".");
+            throw new IllegalArgumentException("There is no movement for " + plate + " that can be " + action + ".");
         }
-        throw new IllegalArgumentException("No rental found for that movement ID or plate number.");
+        throw new IllegalArgumentException("No movement found for that movement ID or plate number.");
     }
 
     /**
-     * Checks a rental in at the staff member's location. Throws with the reason
-     * if it cannot be.
+     * Checks a movement in at the staff member's location. Throws with the
+     * reason if it cannot be.
      */
-    public RentalMovement checkInRental(String movementID, String staffID, Location checkInLoc) {
+    public DrivenMovement checkInMovement(String idOrPlate, String staffID, Location checkInLoc) {
         if (checkInLoc == null) {
             throw new IllegalArgumentException("You have no current location set. Cannot check in a vehicle.");
         }
-        RentalMovement rental = findRentalForCheckIn(movementID);
-        checkIn(rental, staffID, checkInLoc.getLocationID());
-        return rental;
+        DrivenMovement movement = findMovementForCheckIn(idOrPlate);
+        checkIn(movement, staffID, checkInLoc.getLocationID());
+        return movement;
     }
 
     /**
@@ -361,6 +378,9 @@ public class MovementService {
     }
 
     public void closeDrivenMovement(DrivenMovement movement, int odoIn) {
+        if (movement.getStatus() != MovementStatus.INCOMPLETE) {
+            throw new IllegalArgumentException("This movement must be checked in before it can be closed.");
+        }
         movement.closeMovement(odoIn);
         dataStore.saveVehicles();
         dataStore.saveMovements();

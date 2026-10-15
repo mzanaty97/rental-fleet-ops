@@ -1,6 +1,7 @@
 package com.rfo.ui;
 
 import com.rfo.model.Insurance;
+import com.rfo.model.DrivenMovement;
 import com.rfo.model.Location;
 import com.rfo.model.Movement;
 import com.rfo.model.MovementStatus;
@@ -157,7 +158,7 @@ public class RevenueMovementsMenu extends Menu {
         String movementID = scanner.nextLine();
 
         try {
-            movementService.checkInRental(movementID, staff.getStaffID(), staff.getCurrentLocation());
+            movementService.checkInMovement(movementID, staff.getStaffID(), staff.getCurrentLocation());
             System.out.println("Checked in at " + staff.getCurrentLocation().getName()
                     + ". Movement status is now: " + MovementStatus.INCOMPLETE);
         } catch (IllegalArgumentException e) {
@@ -169,28 +170,36 @@ public class RevenueMovementsMenu extends Menu {
         System.out.print("Movement ID or plate number: ");
         String movementID = scanner.nextLine();
 
-        RentalMovement rental;
+        // a rental, a car transfer or a workshop job can all be closed here
+        DrivenMovement movement;
         try {
-            rental = movementService.findRentalForClose(movementID);
+            movement = movementService.findMovementForClose(movementID);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return;
         }
+        String kind = movementService.kindOf(movement);
 
         System.out.print("Odometer reading at check-in: ");
         String odoInput = scanner.nextLine();
         int odoIn;
         try {
-            odoIn = movementService.parseOdometer(odoInput, rental.getOdoOut());
+            odoIn = movementService.parseOdometer(odoInput, movement.getOdoOut());
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        double finalCost = movementService.getRentalCost(rental);
-        System.out.println("Final rental cost: $" + String.format("%.2f", finalCost));
-
-        System.out.print("Confirm payment and close rental? (yes/no): ");
+        // only a rental has a cost to take payment for
+        RentalMovement rental = movement instanceof RentalMovement ? (RentalMovement) movement : null;
+        double finalCost = 0;
+        if (rental != null) {
+            finalCost = movementService.getRentalCost(rental);
+            System.out.println("Final rental cost: $" + String.format("%.2f", finalCost));
+            System.out.print("Confirm payment and close rental? (yes/no): ");
+        } else {
+            System.out.print("Close this " + kind.toLowerCase() + "? (yes/no): ");
+        }
         String confirm = scanner.nextLine();
 
         if (!confirm.trim().equalsIgnoreCase("yes")) {
@@ -199,8 +208,12 @@ public class RevenueMovementsMenu extends Menu {
         }
 
         try {
-            movementService.closeRA(rental, odoIn, finalCost);
-            System.out.println("Rental closed. Vehicle status: " + rental.getVehicle().getStatus());
+            if (rental != null) {
+                movementService.closeRA(rental, odoIn, finalCost);
+            } else {
+                movementService.closeDrivenMovement(movement, odoIn);
+            }
+            System.out.println(kind + " closed. Vehicle status: " + movement.getVehicle().getStatus());
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

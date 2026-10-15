@@ -2,7 +2,7 @@ package com.rfo.gui.controller;
 
 import com.rfo.gui.view.CheckInView;
 import com.rfo.gui.view.MessageSink;
-import com.rfo.model.RentalMovement;
+import com.rfo.model.DrivenMovement;
 import com.rfo.model.Staff;
 import com.rfo.service.MovementService;
 import java.awt.event.ActionEvent;
@@ -10,8 +10,9 @@ import java.awt.event.ActionListener;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Controller for Check In. Asks the MovementService to check the rental in at
- * the staff member's current location.
+ * Controller for Check In. Asks the MovementService to check the movement
+ * (rental, car transfer or workshop job) in at the staff member's current
+ * location.
  */
 public class CheckInController implements ActionListener {
 
@@ -33,11 +34,11 @@ public class CheckInController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            RentalMovement rental = movementService.checkInRental(view.getMovementId(), staff.getStaffID(),
+            DrivenMovement rental = movementService.checkInMovement(view.getMovementId(), staff.getStaffID(),
                     staff.getCurrentLocation());
             String where = staff.getCurrentLocation().getName();
-            console.ok("Checked in at " + where + ". Movement status is now: " + rental.getStatus() + ".");
-            view.showResult(where, rental.getMovementID(), rental.getVehicle().getPlateNumber(),
+            console.ok(movementService.kindOf(rental) + " checked in at " + where + ". Movement status is now: " + rental.getStatus() + ".");
+            view.showResult(where, movementService.kindOf(rental), rental.getMovementID(), rental.getVehicle().getPlateNumber(),
                     rental.getVehicle().getMake() + " " + rental.getVehicle().getModel(),
                     rental.getCheckOutDT().format(WHEN), rental.getCheckInDT().format(WHEN),
                     rental.getExpectedCIDT().format(WHEN));

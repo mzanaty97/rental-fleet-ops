@@ -50,6 +50,8 @@ public class CloseRentalView extends JPanel implements PlainScreen {
     private final JLabel idOk = new JLabel(" ");
     private final JTextField odoBox = new JTextField();
     private final FormField odoField = new FormField("Odometer at check in (km)", false, odoBox, null);
+    private final JLabel costLabel = new JLabel();
+    private final JLabel note = new JLabel();
     private final JButton continueButton = new JButton("Continue to payment");
     private final JLabel[] facts = {new JLabel(), new JLabel(), new JLabel()};
     private final JLabel cost = new JLabel();
@@ -208,7 +210,7 @@ public class CloseRentalView extends JPanel implements PlainScreen {
         JPanel costBox = new JPanel(new BorderLayout());
         costBox.setBackground(Theme.BG_WINDOW);
         costBox.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-        JLabel costLabel = new JLabel("Final rental cost");
+        costLabel.setText("Final rental cost");
         costLabel.setFont(Theme.F_OPTION);
         costLabel.setForeground(Theme.TEXT_PRIMARY);
         cost.setFont(Theme.F_DISPLAY);
@@ -220,7 +222,7 @@ public class CloseRentalView extends JPanel implements PlainScreen {
         body.add(costBox);
         body.add(Box.createVerticalStrut(10));
 
-        JLabel note = new JLabel("<html>Take payment from the customer, then confirm. Closing sets the vehicle back to AVAILABLE.</html>");
+        note.setText("<html>Take payment from the customer, then confirm. Closing sets the vehicle back to AVAILABLE.</html>");
         note.setFont(Theme.F_SMALL.deriveFont(13f));
         note.setForeground(Theme.TEXT_SECONDARY);
         note.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -265,7 +267,12 @@ public class CloseRentalView extends JPanel implements PlainScreen {
         odoBox.requestFocusInWindow();
     }
 
-    public void showPayment(String movement, int odoOut, int odoIn, String finalCost) {
+    public void showPayment(String movement, int odoOut, int odoIn, String finalCost, boolean isRental) {
+        costLabel.setText(isRental ? "Final rental cost" : "Charge");
+        note.setText(isRental
+                ? "<html>Take payment from the customer, then confirm. Closing sets the vehicle back to AVAILABLE.</html>"
+                : "<html>Nothing to pay for this movement. Closing updates the vehicle and sets it back to AVAILABLE.</html>");
+        confirmButton.setText(isRental ? "Confirm payment and close" : "Confirm and close");
         facts[0].setText(movement);
         facts[1].setText(String.format("%,d → %,d", odoOut, odoIn));
         facts[2].setText(String.format("%,d km", odoIn - odoOut));
