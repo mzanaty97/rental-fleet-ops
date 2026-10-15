@@ -108,14 +108,16 @@ public class RentalMovement extends DrivenMovement {
         public final double base;
         public final double insurance;
         public final double rsa;
+        public final double equipment;
         public final double total;
 
-        private Quote(int days, double base, double insurance, double rsa) {
+        private Quote(int days, double base, double insurance, double rsa, double equipment) {
             this.days = days;
             this.base = base;
             this.insurance = insurance;
             this.rsa = rsa;
-            this.total = base + insurance + rsa;
+            this.equipment = equipment;
+            this.total = base + insurance + rsa + equipment;
         }
     }
 
@@ -128,7 +130,20 @@ public class RentalMovement extends DrivenMovement {
         double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
         double insurance = getInsuranceBaseRate(days) * tier.getRate() * days;
         double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
-        return new Quote(days, base, insurance, rsaCost);
+        return new Quote(days, base, insurance, rsaCost, 0.0);
+    }
+
+    /**
+     * What each part of the price came to once the rental was checked in (days,
+     * base, insurance, RSA, equipment). The total matches
+     * calculateRentalCost(). Used to write the invoice.
+     */
+    public Quote getFinalCharges() {
+        int days = getDaysBetween(checkOutDT, checkInDT);
+        double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
+        double insurance = getInsuranceBaseRate(days) * insuranceTier.getRate() * days;
+        double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
+        return new Quote(days, base, insurance, rsaCost, calculateEquipmentCost(days));
     }
 
     public double getRentalEstimate() {

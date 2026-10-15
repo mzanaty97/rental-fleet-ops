@@ -381,6 +381,14 @@ public class MovementService {
         dataStore.saveMovements();
     }
 
+    /**
+     * The invoice rules, which share this service's data (a rental's invoice is
+     * made when it closes).
+     */
+    public InvoiceService invoices() {
+        return new InvoiceService(dataStore);
+    }
+
     public double getRentalCost(RentalMovement rental) {
         return rental.calculateRentalCost();
     }
@@ -394,6 +402,8 @@ public class MovementService {
         rental.closeMovement(odoIn, finalPrice);
         dataStore.saveVehicles();
         dataStore.saveMovements();
+        // the invoice is written as soon as the rental closes, so it can be reprinted later
+        invoices().issueFor(rental);
     }
 
     public void closeDrivenMovement(DrivenMovement movement, int odoIn) {

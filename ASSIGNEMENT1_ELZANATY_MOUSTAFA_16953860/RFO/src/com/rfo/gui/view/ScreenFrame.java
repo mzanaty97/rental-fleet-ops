@@ -111,7 +111,15 @@ public class ScreenFrame extends JPanel {
             wrap.setOpaque(false);
             wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
             wrap.add(holder, BorderLayout.NORTH);
-            add(wrap, BorderLayout.CENTER);
+            // when the window is too short for the screen, the mouse wheel and a scroll bar move it
+            javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(wrap,
+                    javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scroll.setBorder(null);
+            scroll.setOpaque(false);
+            scroll.getViewport().setOpaque(false);
+            scroll.getVerticalScrollBar().setUnitIncrement(24);
+            add(scroll, BorderLayout.CENTER);
         } else {
             JPanel card = new JPanel(new BorderLayout());
             card.setBackground(Theme.BG_SURFACE);

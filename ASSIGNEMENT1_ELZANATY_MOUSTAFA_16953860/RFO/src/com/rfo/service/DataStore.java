@@ -2,11 +2,13 @@ package com.rfo.service;
 
 import com.rfo.db.DatabaseSeeder;
 import com.rfo.io.DriverDAO;
+import com.rfo.io.InvoiceDAO;
 import com.rfo.io.LocationDAO;
 import com.rfo.io.MovementDAO;
 import com.rfo.io.StaffDAO;
 import com.rfo.io.VehicleDAO;
 import com.rfo.model.Driver;
+import com.rfo.model.Invoice;
 import com.rfo.model.Location;
 import com.rfo.model.Movement;
 import com.rfo.model.Staff;
@@ -23,12 +25,14 @@ public class DataStore {
     private List<Movement> movements = new ArrayList<>();
     private List<Staff> staff = new ArrayList<>();
     private List<Vehicle> vehicles = new ArrayList<>();
+    private List<Invoice> invoices = new ArrayList<>();
 
     private final LocationDAO locationDAO = new LocationDAO();
     private final DriverDAO driverDAO = new DriverDAO();
     private final MovementDAO movementDAO = new MovementDAO();
     private final StaffDAO staffDAO = new StaffDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
+    private final InvoiceDAO invoiceDAO = new InvoiceDAO();
 
     private final List<ModelListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -42,9 +46,10 @@ public class DataStore {
         this.vehicles = vehicleDAO.loadAll(locations);
         this.staff = staffDAO.loadAll(locations);
         this.movements = movementDAO.loadAll(vehicles, locations);
+        this.invoices = invoiceDAO.loadAll();
     }
-    
-        public void addListener(ModelListener listener) {
+
+    public void addListener(ModelListener listener) {
         listeners.add(listener);
     }
 
@@ -101,6 +106,15 @@ public class DataStore {
 
     public List<Movement> getMovements() {
         return this.movements;
+    }
+
+    public void saveInvoices() {
+        invoiceDAO.saveAll(invoices);
+        notifyListeners();
+    }
+
+    public List<Invoice> getInvoices() {
+        return this.invoices;
     }
 
     public <T> List<T> search(List<T> list, Predicate<T> condition) {

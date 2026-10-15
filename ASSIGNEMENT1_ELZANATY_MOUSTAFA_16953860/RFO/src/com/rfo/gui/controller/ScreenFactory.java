@@ -11,6 +11,7 @@ import com.rfo.gui.view.CloseLocationView;
 import com.rfo.gui.view.DefleetView;
 import com.rfo.gui.view.FleetView;
 import com.rfo.gui.view.GrantAccessView;
+import com.rfo.gui.view.InvoiceView;
 import com.rfo.gui.view.LocationsView;
 import com.rfo.gui.view.NewVehicleView;
 import com.rfo.gui.view.ReportView;
@@ -77,6 +78,10 @@ public class ScreenFactory {
                 CloseRentalView closeRental = new CloseRentalView();
                 new CloseRentalController(closeRental, movementService, sessionView.getConsole());
                 return closeRental;
+            case "Print Invoice":
+                InvoiceView invoice = new InvoiceView();
+                new InvoiceController(invoice, movementService.invoices(), sessionView.getConsole());
+                return invoice;
             case "New Vehicle":
                 NewVehicleView newVehicle = new NewVehicleView();
                 new NewVehicleController(newVehicle, vehicleService, staff, sessionView.getConsole());

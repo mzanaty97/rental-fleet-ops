@@ -9,6 +9,7 @@ import com.rfo.model.RentalMovement;
 import com.rfo.model.Staff;
 import com.rfo.model.Vehicle;
 import com.rfo.service.DataStore;
+import com.rfo.service.InvoiceService;
 import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
 import java.time.LocalDateTime;
@@ -62,7 +63,7 @@ public class RevenueMovementsMenu extends Menu {
                 System.out.println("Not built yet. Coming soon!");
                 break;
             case "Print Invoice":
-                System.out.println("Not built yet. Coming soon!");
+                printInvoice();
                 break;
             default:
                 System.out.println(select + " not implemented yet.");
@@ -161,6 +162,18 @@ public class RevenueMovementsMenu extends Menu {
             movementService.checkInMovement(movementID, staff.getStaffID(), staff.getCurrentLocation());
             System.out.println("Checked in at " + staff.getCurrentLocation().getName()
                     + ". Movement status is now: " + MovementStatus.INCOMPLETE);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // shows the saved invoice of a closed rental (the GUI can also save it as a PDF)
+    private void printInvoice() {
+        System.out.print("Movement ID or plate number: ");
+        String idOrPlate = scanner.nextLine();
+        try {
+            InvoiceService invoices = movementService.invoices();
+            System.out.println(invoices.toText(invoices.findInvoice(idOrPlate)));
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

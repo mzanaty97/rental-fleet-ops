@@ -193,12 +193,37 @@ public final class Theme {
     /**
      * Call once, first thing in main(), before building any window.
      */
+    /**
+     * Adds the Mac Cmd shortcuts (copy, paste, cut, select all) to every kind
+     * of text box. The Metal look and feel only binds the Ctrl versions, which
+     * is why Cmd+V did nothing before. The Ctrl versions keep working.
+     */
+    public static void installMacTextShortcuts() {
+        String[] maps = {"TextField.focusInputMap", "PasswordField.focusInputMap", "TextArea.focusInputMap",
+            "FormattedTextField.focusInputMap", "EditorPane.focusInputMap", "TextPane.focusInputMap"};
+        for (String name : maps) {
+            javax.swing.InputMap map = (javax.swing.InputMap) UIManager.get(name);
+            if (map == null) {
+                continue;
+            }
+            map.put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), javax.swing.text.DefaultEditorKit.copyAction);
+            map.put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), javax.swing.text.DefaultEditorKit.pasteAction);
+            map.put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), javax.swing.text.DefaultEditorKit.cutAction);
+            map.put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), javax.swing.text.DefaultEditorKit.selectAllAction);
+        }
+    }
+
     public static void installDefaults() {
         try {
             UIManager.put("swing.boldMetal", Boolean.FALSE);
             UIManager.setLookAndFeel(new MetalLookAndFeel());
         } catch (Exception ignored) {
             // Metal ships with every JDK; if it fails we simply keep the default look.
+        }
+
+        // On a Mac, text fields should answer to Cmd+C, Cmd+V, Cmd+X and Cmd+A (Metal only knows Ctrl).
+        if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
+            installMacTextShortcuts();
         }
 
         // 1. One body font for every component, then the exceptions below.
