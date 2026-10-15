@@ -57,7 +57,7 @@ public class RevenueMovementsMenu extends Menu {
                 closeRental();
                 break;
             case "Amend Rental":
-                System.out.println("Not built yet. Coming soon!");
+                amendRental();
                 break;
             case "Changeover":
                 System.out.println("Not built yet. Coming soon!");
@@ -162,6 +162,27 @@ public class RevenueMovementsMenu extends Menu {
             movementService.checkInMovement(movementID, staff.getStaffID(), staff.getCurrentLocation());
             System.out.println("Checked in at " + staff.getCurrentLocation().getName()
                     + ". Movement status is now: " + MovementStatus.INCOMPLETE);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // changes the expected return of an open rental
+    private void amendRental() {
+        System.out.print("Movement ID or plate number: ");
+        String idOrPlate = scanner.nextLine();
+        try {
+            RentalMovement rental = movementService.findRentalForAmend(idOrPlate);
+            System.out.println("Expected return now: " + rental.getExpectedCIDT() + " at " + rental.getExpectedCILoc().getName());
+            System.out.print("New return date and time (for example 18102026 1000): ");
+            String date = scanner.nextLine();
+            System.out.print("Return location ID (Enter keeps " + rental.getExpectedCILoc().getLocationID() + "): ");
+            String loc = scanner.nextLine().trim();
+            if (loc.isEmpty()) {
+                loc = rental.getExpectedCILoc().getLocationID();
+            }
+            movementService.amendRental(rental, date, loc);
+            System.out.println("Rental amended. New return: " + rental.getExpectedCIDT() + " at " + rental.getExpectedCILoc().getName());
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

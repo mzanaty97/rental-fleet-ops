@@ -12,7 +12,7 @@ import java.util.Set;
 public final class MenuInfo {
 
     private static final Map<String, String> DESCRIPTIONS = new HashMap<>();
-    private static final Set<String> COMING_SOON = Set.of("Amend Rental", "Changeover");
+    private static final Set<String> COMING_SOON = Set.of("Changeover");
 
     static {
         // main menu
@@ -31,6 +31,7 @@ public final class MenuInfo {
         put("Checkout", "Start a rental and hand over a vehicle");
         put("Check In", "Receive a returned rental vehicle");
         put("Close Rental", "Take payment and close a checked-in rental");
+        put("Amend Rental", "Change the return date, time or location of an open rental");
         put("Print Invoice", "Show a closed rental's invoice and print it as a PDF");
         put("New Vehicle", "Add a vehicle to the fleet");
         put("Car Transfer", "Move a vehicle between locations");

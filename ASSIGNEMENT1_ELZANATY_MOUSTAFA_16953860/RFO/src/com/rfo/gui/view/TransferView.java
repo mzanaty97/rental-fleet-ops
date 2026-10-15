@@ -64,6 +64,7 @@ public class TransferView extends JPanel implements FullScreen {
     public static final String PLATE = "plate";
     public static final String LIST_AVAILABLE = "listAvailable";
     public static final String ADD_DRIVER = "addDriver";
+    public static final String NEW_DRIVER = "newDriver";
     public static final String DATE = "date";
     public static final String TIME = "time";
     public static final String START = "start";
@@ -246,11 +247,19 @@ public class TransferView extends JPanel implements FullScreen {
         JButton add = new JButton("Add driver");
         add.setIcon(Icons.icon(Icons.Type.PLUS, 14, Theme.TEXT_PRIMARY));
         add.addActionListener(e -> fire(ADD_DRIVER));
+        // a second button for a customer who is not in the system yet
+        JButton newDriver = new JButton("New driver");
+        newDriver.setIcon(Icons.icon(Icons.Type.PLUS, 14, Theme.TEXT_PRIMARY));
+        newDriver.addActionListener(e -> fire(NEW_DRIVER));
+        JPanel buttonRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 0));
+        buttonRow.setOpaque(false);
+        buttonRow.add(add);
+        buttonRow.add(newDriver);
         JPanel addBox = new JPanel(new BorderLayout());
         addBox.setOpaque(false);
         addBox.setBorder(BorderFactory.createEmptyBorder(22, 0, 0, 0));
-        addBox.add(add, BorderLayout.NORTH);
-        addBox.setMaximumSize(new Dimension(add.getPreferredSize().width, Short.MAX_VALUE));
+        addBox.add(buttonRow, BorderLayout.NORTH);
+        addBox.setMaximumSize(new Dimension(buttonRow.getPreferredSize().width, Short.MAX_VALUE));
         JPanel row = hrow(12, driverField, addBox);
         JLabel help = new JLabel("At least one driver. Press Enter to add, then Enter again to continue.");
         help.setFont(Theme.F_SMALL);

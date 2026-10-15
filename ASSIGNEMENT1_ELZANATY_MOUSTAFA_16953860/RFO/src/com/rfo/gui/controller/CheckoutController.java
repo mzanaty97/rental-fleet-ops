@@ -64,6 +64,9 @@ public class CheckoutController implements ActionListener, ModelListener {
             case CheckoutView.ADD_DRIVER:
                 addDriver();
                 break;
+            case CheckoutView.NEW_DRIVER:
+                newDriver();
+                break;
             case CheckoutView.REVIEW:
                 review();
                 break;
@@ -216,11 +219,27 @@ public class CheckoutController implements ActionListener, ModelListener {
             if (view.getDriverIds().contains(id)) {
                 throw new IllegalArgumentException("Driver " + id + " is already added.");
             }
+            // the driver must already exist; a new customer is created with the New driver button
+            movementService.findDriver(String.valueOf(id));
             view.addDriver(id);
         } catch (IllegalArgumentException ex) {
-            view.setDriverError(ex.getMessage());
-            console.error(ex.getMessage());
+            String message = ex.getMessage().equals("Driver not found.")
+                    ? "Driver not found. Press New driver to create one." : ex.getMessage();
+            view.setDriverError(message);
+            console.error(message);
         }
+    }
+
+    /**
+     * Opens the New driver pop-up; a driver that gets created is added to this
+     * screen's drivers.
+     */
+    private void newDriver() {
+        NewDriverController.open(view, movementService.drivers(), console, id -> {
+            if (!view.getDriverIds().contains(id)) {
+                view.addDriver(id);
+            }
+        });
     }
 
     private void review() {

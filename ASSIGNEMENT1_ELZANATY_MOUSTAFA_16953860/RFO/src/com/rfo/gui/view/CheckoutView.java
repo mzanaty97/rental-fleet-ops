@@ -54,6 +54,7 @@ public class CheckoutView extends JPanel implements FullScreen {
 
     public static final String PLATE = "plate";
     public static final String ADD_DRIVER = "addDriver";
+    public static final String NEW_DRIVER = "newDriver";
     public static final String REVIEW = "review";
     public static final String CONFIRM = "confirm";
     public static final String ABANDON = "abandon";
@@ -266,13 +267,22 @@ public class CheckoutView extends JPanel implements FullScreen {
                 dateBox.requestFocusInWindow();
             }
         });
+        // a second button for a customer who is not in the system yet
+        JButton newButton = new JButton("New driver");
+        newButton.setIcon(Icons.icon(Icons.Type.PLUS, 14, Theme.TEXT_PRIMARY));
+        newButton.setActionCommand(NEW_DRIVER);
+        newButton.addActionListener(e -> fire(NEW_DRIVER));
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        buttonRow.setOpaque(false);
+        buttonRow.add(addButton);
+        buttonRow.add(newButton);
         JPanel buttonBox = new JPanel(new BorderLayout());
         buttonBox.setOpaque(false);
         buttonBox.setBorder(BorderFactory.createEmptyBorder(22, 0, 0, 0));
-        buttonBox.add(addButton, BorderLayout.NORTH);
+        buttonBox.add(buttonRow, BorderLayout.NORTH);
         add.add(driverField, BorderLayout.WEST);
         add.add(buttonBox, BorderLayout.CENTER);
-        JLabel help = new JLabel("At least one driver. Press Enter to add, then Enter again to continue.");
+        JLabel help = new JLabel("At least one driver. Press Enter to add, then Enter again to continue. New customer? Press New driver.");
         help.setFont(Theme.F_SMALL);
         help.setForeground(Theme.TEXT_SECONDARY);
         JPanel body = new JPanel();

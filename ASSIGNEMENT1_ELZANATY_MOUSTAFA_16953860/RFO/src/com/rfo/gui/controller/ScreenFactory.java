@@ -2,6 +2,7 @@ package com.rfo.gui.controller;
 
 import com.rfo.gui.view.AddLocationView;
 import com.rfo.gui.view.AddStaffView;
+import com.rfo.gui.view.AmendRentalView;
 import com.rfo.gui.view.ChangeLocationView;
 import com.rfo.gui.view.CheckInView;
 import com.rfo.gui.view.CheckoutView;
@@ -78,6 +79,11 @@ public class ScreenFactory {
                 CloseRentalView closeRental = new CloseRentalView();
                 new CloseRentalController(closeRental, movementService, sessionView.getConsole());
                 return closeRental;
+            case "Amend Rental":
+                AmendRentalView amend = new AmendRentalView();
+                sessionView.addModelListener(new AmendRentalController(amend, movementService, locationService,
+                        sessionView.getConsole()));
+                return amend;
             case "Print Invoice":
                 InvoiceView invoice = new InvoiceView();
                 new InvoiceController(invoice, movementService.invoices(), sessionView.getConsole());

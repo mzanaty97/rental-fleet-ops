@@ -147,7 +147,15 @@ public class RentalMovement extends DrivenMovement {
     }
 
     public double getRentalEstimate() {
-        int days = getDaysBetween(checkOutDT, expectedCIDT);
+        return estimateFor(expectedCIDT);
+    }
+
+    /**
+     * What the rental would cost if it were returned at the given time (used to
+     * preview an amendment).
+     */
+    public double estimateFor(LocalDateTime returnAt) {
+        int days = getDaysBetween(checkOutDT, returnAt);
         double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
         return base + calculateEquipmentCost(days) + calculateInsuranceCost(days);
     }

@@ -49,6 +49,15 @@ public abstract class DrivenMovement extends Movement {
         return expectedCILoc;
     }
 
+    /**
+     * Changes where and when the vehicle is expected back. Used when an open
+     * rental is amended.
+     */
+    public void amendExpectedReturn(LocalDateTime expectedCIDT, Location expectedCILoc) {
+        this.expectedCIDT = expectedCIDT;
+        this.expectedCILoc = expectedCILoc;
+    }
+
     @Override
     public void execute() {
         vehicle.setCurrentOdometer(odoIn);

@@ -199,6 +199,76 @@ public class MovementService {
     }
 
     /**
+     * Finds a rental that can still be amended: it must be OPEN (not yet
+     * checked in). The text can be a movement ID or a plate number. Throws with
+     * the reason if not.
+     */
+    public RentalMovement findRentalForAmend(String idOrPlate) {
+        DrivenMovement movement = findDriven(idOrPlate, MovementStatus.OPEN, "amended");
+        if (!(movement instanceof RentalMovement)) {
+            throw new IllegalArgumentException("Only rentals can be amended (this is a " + kindOf(movement).toLowerCase() + ").");
+        }
+        if (movement.getStatus() != MovementStatus.OPEN) {
+            throw new IllegalArgumentException("This rental has already been checked in or closed, so it cannot be amended.");
+        }
+        return (RentalMovement) movement;
+    }
+
+    /**
+     * What an amendment would change, worked out and checked but not saved.
+     * Shown on the confirm card.
+     */
+    public static class AmendPreview {
+
+        public final LocalDateTime newReturn;
+        public final Location newLocation;
+        public final double oldEstimate;
+        public final double newEstimate;
+
+        private AmendPreview(LocalDateTime newReturn, Location newLocation, double oldEstimate, double newEstimate) {
+            this.newReturn = newReturn;
+            this.newLocation = newLocation;
+            this.oldEstimate = oldEstimate;
+            this.newEstimate = newEstimate;
+        }
+    }
+
+    /**
+     * Checks a proposed change to an open rental's expected return and works
+     * out the new estimate, without saving anything. The date is typed text
+     * (the time is optional: without one the rental keeps its current return
+     * time). The new return must be in the future and after the pick-up, the
+     * location must be active, and something must actually change. Throws with
+     * the reason if not.
+     */
+    public AmendPreview previewAmend(RentalMovement rental, String dateText, String locationID) {
+        if (rental.getStatus() != MovementStatus.OPEN) {
+            throw new IllegalArgumentException("This rental has already been checked in or closed, so it cannot be amended.");
+        }
+        DateTimeInput.Result typed = DateTimeInput.parseDateTime(dateText);
+        LocalDateTime newReturn = typed.date.atTime(typed.time != null ? typed.time : rental.getExpectedCIDT().toLocalTime());
+        validateExpectedReturn(newReturn);
+        if (!newReturn.isAfter(rental.getCheckOutDT())) {
+            throw new IllegalArgumentException("Return must be after the pick-up (" + rental.getCheckOutDT().toLocalDate() + ").");
+        }
+        Location newLoc = findActiveLocation(locationID);
+        if (newReturn.equals(rental.getExpectedCIDT()) && newLoc.getLocationID().equals(rental.getExpectedCILoc().getLocationID())) {
+            throw new IllegalArgumentException("Nothing has changed.");
+        }
+        return new AmendPreview(newReturn, newLoc, rental.getRentalEstimate(), rental.estimateFor(newReturn));
+    }
+
+    /**
+     * Applies an amendment after every check in previewAmend has passed, and
+     * saves it. Throws with the reason if not.
+     */
+    public void amendRental(RentalMovement rental, String dateText, String locationID) {
+        AmendPreview preview = previewAmend(rental, dateText, locationID);
+        rental.amendExpectedReturn(preview.newReturn, preview.newLocation);
+        dataStore.saveMovements();
+    }
+
+    /**
      * A short name for the kind of movement, for screens and messages.
      */
     public String kindOf(Movement movement) {
@@ -379,6 +449,13 @@ public class MovementService {
 
         movement.checkIn(staffID, checkInLoc, LocalDateTime.now());
         dataStore.saveMovements();
+    }
+
+    /**
+     * The rules for creating a driver, which share this service's data.
+     */
+    public DriverService drivers() {
+        return new DriverService(dataStore);
     }
 
     /**

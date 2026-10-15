@@ -2,6 +2,7 @@ package com.rfo.gui.controller;
 
 import com.rfo.gui.view.MenuView;
 import com.rfo.gui.view.ScreenFrame;
+import com.rfo.gui.view.ScrollHost;
 import com.rfo.gui.view.SessionView;
 import com.rfo.model.Staff;
 import com.rfo.service.MenuNode;
@@ -44,7 +45,8 @@ public class NavigationController {
             String command = e.getActionCommand();
             sessionView.showScreen(MenuView.BACK.equals(command) ? parentKey : key + "/" + command);
         });
-        sessionView.addScreen(key, menu);
+        // a menu scrolls when the window is too short to show every option
+        sessionView.addScreen(key, ScrollHost.wrap(menu, false));
 
         for (MenuNode child : node.getChildren()) {
             String childKey = key + "/" + child.getLabel();

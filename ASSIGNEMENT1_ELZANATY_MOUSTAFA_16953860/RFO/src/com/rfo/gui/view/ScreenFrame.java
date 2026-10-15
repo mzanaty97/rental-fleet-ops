@@ -96,12 +96,12 @@ public class ScreenFrame extends JPanel {
         if (content instanceof PlaceholderView) {
             add(content, BorderLayout.CENTER);
         } else if (content instanceof FullScreen) {
-            // the screen draws its own cards and stretches with the window
+            // the screen draws its own cards and stretches with the window; it scrolls if the window is too short
             JPanel wrap = new JPanel(new BorderLayout());
             wrap.setOpaque(false);
             wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
             wrap.add(content, BorderLayout.CENTER);
-            add(wrap, BorderLayout.CENTER);
+            add(ScrollHost.wrap(wrap, true), BorderLayout.CENTER);
         } else if (content instanceof PlainScreen) {
             // the screen draws its own cards: put it at the top left, at its own size
             JPanel holder = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
@@ -112,14 +112,7 @@ public class ScreenFrame extends JPanel {
             wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
             wrap.add(holder, BorderLayout.NORTH);
             // when the window is too short for the screen, the mouse wheel and a scroll bar move it
-            javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(wrap,
-                    javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            scroll.setBorder(null);
-            scroll.setOpaque(false);
-            scroll.getViewport().setOpaque(false);
-            scroll.getVerticalScrollBar().setUnitIncrement(24);
-            add(scroll, BorderLayout.CENTER);
+            add(ScrollHost.wrap(wrap, false), BorderLayout.CENTER);
         } else {
             JPanel card = new JPanel(new BorderLayout());
             card.setBackground(Theme.BG_SURFACE);
@@ -129,7 +122,7 @@ public class ScreenFrame extends JPanel {
             wrap.setOpaque(false);
             wrap.setBorder(BorderFactory.createEmptyBorder(16, 32, 24, 32));
             wrap.add(card, BorderLayout.CENTER);
-            add(wrap, BorderLayout.CENTER);
+            add(ScrollHost.wrap(wrap, true), BorderLayout.CENTER);
         }
 
         installBackspace();
