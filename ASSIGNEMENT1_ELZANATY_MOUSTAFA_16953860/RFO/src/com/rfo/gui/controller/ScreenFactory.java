@@ -13,6 +13,9 @@ import com.rfo.gui.view.FleetView;
 import com.rfo.gui.view.GrantAccessView;
 import com.rfo.gui.view.LocationsView;
 import com.rfo.gui.view.NewVehicleView;
+import com.rfo.gui.view.ReportView;
+import com.rfo.gui.view.MovementDetailsView;
+import com.rfo.gui.view.DriverView;
 import com.rfo.gui.view.PlaceholderView;
 import com.rfo.gui.view.RevokeAccessView;
 import com.rfo.gui.view.SessionView;
@@ -92,6 +95,39 @@ public class ScreenFactory {
                 DefleetView defleet = new DefleetView();
                 new DefleetController(defleet, vehicleService, staff, sessionView.getConsole());
                 return defleet;
+            case "Query Movement Details":
+                MovementDetailsView details = new MovementDetailsView();
+                new MovementDetailsController(details, movementService, sessionView.getConsole());
+                return details;
+            case "Query Drivers":
+                DriverView drivers = new DriverView();
+                new DriverController(drivers, movementService, sessionView.getConsole());
+                return drivers;
+            case "Out on Rental Report":
+                ReportView outOnRental = new ReportView(new String[]{"Rego", "Expected Return", "Category"},
+                        new int[]{}, null);
+                sessionView.addModelListener(reportController(outOnRental, ReportController.Report.OUT_ON_RENTAL,
+                        staff, sessionView));
+                return outOnRental;
+            case "Location Fleet":
+                ReportView locationFleet = new ReportView(new String[]{"Rego", "Odometer", "Status"},
+                        new int[]{1}, "Location");
+                sessionView.addModelListener(reportController(locationFleet, ReportController.Report.LOCATION_FLEET,
+                        staff, sessionView));
+                return locationFleet;
+            case "New Vehicles":
+                ReportView newVehicles = new ReportView(new String[]{"Rego", "Odometer (km)", "Location"},
+                        new int[]{1}, null);
+                sessionView.addModelListener(reportController(newVehicles, ReportController.Report.NEW_VEHICLES,
+                        staff, sessionView));
+                return newVehicles;
+            case "Staff Rental Reports":
+                ReportView staffRentals = new ReportView(
+                        new String[]{"Movement ID", "Checkout date", "Checkin date", "Status"}, new int[]{},
+                        "Staff member");
+                sessionView.addModelListener(reportController(staffRentals, ReportController.Report.STAFF_RENTALS,
+                        staff, sessionView));
+                return staffRentals;
             case "View Staff":
                 StaffView staffList = new StaffView();
                 sessionView.addModelListener(new StaffListController(staffList, staffService));
@@ -132,5 +168,12 @@ public class ScreenFactory {
     private JComponent fleetScreen(FleetView view, SessionView sessionView) {
         sessionView.addModelListener(new FleetController(view, vehicleService, sessionView.getConsole()));
         return view;
+    }
+
+    // builds a report controller; the services are the ones this factory already holds
+    private ReportController reportController(ReportView view, ReportController.Report report, Staff staff,
+            SessionView sessionView) {
+        return new ReportController(view, report, vehicleService, movementService, locationService, staffService,
+                staff, sessionView.getConsole());
     }
 }

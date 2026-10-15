@@ -1,25 +1,28 @@
 package com.rfo.ui;
 
 import com.rfo.model.Location;
-import com.rfo.model.Movement;
 import com.rfo.model.MovementStatus;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Staff;
 import com.rfo.model.Vehicle;
-import com.rfo.model.VehicleStatus;
 import com.rfo.service.DataStore;
+import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
-import java.util.Comparator;
+import com.rfo.service.VehicleService;
 import java.util.List;
 import java.util.Scanner;
 
 public class ReportsMenu extends Menu {
 
     private StaffService staffService;
+    private VehicleService vehicleService;
+    private MovementService movementService;
 
     public ReportsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
         this.staffService = new StaffService(dataStore);
+        this.vehicleService = new VehicleService(dataStore);
+        this.movementService = new MovementService(dataStore);
     }
 
     @Override
@@ -54,40 +57,23 @@ public class ReportsMenu extends Menu {
     }
 
     private void outOnRentalReport() {
-        List<Movement> ora = dataStore.search(dataStore.getMovements(), m -> m instanceof RentalMovement
-                && m.getStatus().equals(MovementStatus.OPEN));
-
-        String currentLocID = staff.getCurrentLocation() != null
-                ? staff.getCurrentLocation().getLocationID() : null;
-
-        if (currentLocID == null) {
-            System.out.println("You have no current location set.");
+        List<RentalMovement> open;
+        try {
+            open = movementService.getOutOnRental(staff.getCurrentLocation());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
-
-        ora = dataStore.search(ora, m -> {
-            RentalMovement rm = (RentalMovement) m;
-            boolean checkedOutHere = m.getCheckOutLoc().getLocationID().equals(currentLocID);
-            boolean returningHere = rm.getExpectedCILoc() != null
-                    && rm.getExpectedCILoc().getLocationID().equals(currentLocID);
-            return checkedOutHere || returningHere;
-        });
-
-        if (ora.isEmpty()) {
+        if (open.isEmpty()) {
             System.out.println("No open movements found");
             return;
         }
 
-        ora.sort(Comparator
-                .comparing((Movement m) -> ((RentalMovement) m).getExpectedCIDT())
-                .thenComparing(m -> m.getVehicle().getCategory()));
-
         System.out.println("\n--- Out on Rental Report ---");
         System.out.println("Rego\tExpected Return\tCategory");
-        for (Movement m : ora) {
-            RentalMovement rm = (RentalMovement) m;
-            System.out.println(m.getVehicle().getPlateNumber() + "\t"
-                    + rm.getExpectedCIDT() + "\t" + m.getVehicle().getCategory());
+        for (RentalMovement rm : open) {
+            System.out.println(rm.getVehicle().getPlateNumber() + "\t"
+                    + rm.getExpectedCIDT() + "\t" + rm.getVehicle().getCategory());
         }
     }
 
@@ -103,17 +89,11 @@ public class ReportsMenu extends Menu {
             return;
         }
 
-        List<Vehicle> fleet = dataStore.search(dataStore.getVehicles(),
-                v -> v.getCurrentLocation() != null
-                && v.getCurrentLocation().getLocationID().equals(input));
-
+        List<Vehicle> fleet = vehicleService.getLocationFleet(input);
         if (fleet.isEmpty()) {
             System.out.println("No vehicles at this location");
             return;
         }
-
-        fleet.sort(Comparator.comparingInt(Vehicle::getCurrentOdometer)
-                .thenComparing(Vehicle::getCategory));
 
         System.out.println("\n--- " + input + " Fleet ---");
         System.out.println("Rego\t|Odometer\t|Status");
@@ -123,19 +103,11 @@ public class ReportsMenu extends Menu {
     }
 
     private void newVehicles() {
-        List<Vehicle> newCar = dataStore.search(dataStore.getVehicles(),
-                v -> v.getCurrentOdometer() <= 30
-                && v.getStatus().equals(VehicleStatus.AVAILABLE));
-
+        List<Vehicle> newCar = vehicleService.getNewVehicles();
         if (newCar.isEmpty()) {
             System.out.println("No new cars available.");
             return;
         }
-
-        newCar.sort(Comparator
-                .comparing((Vehicle v) -> v.getCurrentLocation() != null ? v.getCurrentLocation().getLocationID() : "")
-                .thenComparingInt(Vehicle::getCurrentOdometer)
-                .thenComparing(Vehicle::getPlateNumber));
 
         System.out.println("\n--- New Cars ---");
         System.out.println("Rego\t|\tLocation\t");
@@ -149,25 +121,20 @@ public class ReportsMenu extends Menu {
         System.out.print("Staff ID: ");
         String staffID = scanner.nextLine();
 
-        List<Movement> rentals = dataStore.search(dataStore.getMovements(),
-                m -> m instanceof RentalMovement && m.getCOStaff().equals(staffID));
-
+        List<RentalMovement> rentals = movementService.getStaffRentals(staffID);
         if (rentals.isEmpty()) {
             System.out.println("No rentals found for this staff member.");
             return;
         }
 
-        rentals.sort(Comparator.comparingInt(m -> Integer.parseInt(m.getMovementID())));
-
         System.out.println("\n--- Staff Rental Report: " + staffID + " ---");
         System.out.println("Movement ID\t|\tCO Date\t|\tCI Date\t|\tStatus");
-        for (Movement m : rentals) {
-            RentalMovement rm = (RentalMovement) m;
-            String ciDate = m.getCheckInDT() != null
-                    ? m.getCheckInDT().toString()
+        for (RentalMovement rm : rentals) {
+            String ciDate = rm.getCheckInDT() != null
+                    ? rm.getCheckInDT().toString()
                     : rm.getExpectedCIDT() + " (expected)";
-            String flag = m.getStatus() == MovementStatus.CLOSED ? "C" : "O";
-            System.out.println(m.getMovementID() + "\t|\t" + m.getCheckOutDT() + "\t|\t" + ciDate + "\t|\t" + flag);
+            String flag = rm.getStatus() == MovementStatus.CLOSED ? "C" : "O";
+            System.out.println(rm.getMovementID() + "\t|\t" + rm.getCheckOutDT() + "\t|\t" + ciDate + "\t|\t" + flag);
         }
     }
 

@@ -2,6 +2,8 @@ package com.rfo.service;
 
 import com.rfo.model.CarTransferMovement;
 import com.rfo.model.DrivenMovement;
+import com.rfo.model.Driver;
+import com.rfo.model.Staff;
 import com.rfo.model.Insurance;
 import com.rfo.model.Location;
 import com.rfo.model.Movement;
@@ -11,6 +13,7 @@ import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleStatus;
 import com.rfo.model.WorkshopMovement;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 public class MovementService {
@@ -150,6 +153,7 @@ public class MovementService {
         if (driverIDs == null || driverIDs.isEmpty()) {
             throw new IllegalArgumentException("At least one driver is required.");
         }
+        requireKnownDrivers(driverIDs);
         validateExpectedReturn(expectedCIDT);
         Location expectedCILoc = findActiveLocation(expectedCILocID);
         if (insuranceTier == null) {
@@ -325,6 +329,9 @@ public class MovementService {
         Location checkOutLoc = findLocationForNonRevenue(checkOutLocID);
         Vehicle vehicle = findVehicleForNonRevenue(plateNumber, checkOutLoc);
         Location expectedCILoc = checkDrivenDetails(driverIDs, expectedCILocID);
+        if (expectedCILoc.getLocationID().equals(checkOutLoc.getLocationID())) {
+            throw new IllegalArgumentException("The arrival location must be different from where the car is now.");
+        }
 
         CarTransferMovement ctm = new CarTransferMovement(vehicle, staffID, checkOutLoc,
                 vehicle.getCurrentOdometer(), driverIDs, expectedCIDT, expectedCILoc);
@@ -349,7 +356,19 @@ public class MovementService {
         if (driverIDs == null || driverIDs.isEmpty()) {
             throw new IllegalArgumentException("At least one driver is required.");
         }
+        requireKnownDrivers(driverIDs);
         return findActiveLocation(expectedCILocID);
+    }
+
+    /**
+     * Every driver ID on a movement must belong to a real driver.
+     */
+    private void requireKnownDrivers(List<Integer> driverIDs) {
+        for (int id : driverIDs) {
+            if (dataStore.getBy(dataStore.getDrivers(), d -> d.getDriverID() == id) == null) {
+                throw new IllegalArgumentException("Driver " + id + " was not found.");
+            }
+        }
     }
 
     // Phase 1 of return: stops the billing clock, records who/when/where.
@@ -384,5 +403,96 @@ public class MovementService {
         movement.closeMovement(odoIn);
         dataStore.saveVehicles();
         dataStore.saveMovements();
+    }
+
+    // ---- Lookups and reports (used by the Movement Details and Reports screens) ----
+    /**
+     * Finds a movement by its ID. Throws with the reason if the text is empty
+     * or nothing matches.
+     */
+    public Movement findMovement(String movementID) {
+        String id = movementID == null ? "" : movementID.trim();
+        if (id.isEmpty()) {
+            throw new IllegalArgumentException("Enter a movement ID.");
+        }
+        Movement movement = dataStore.getBy(dataStore.getMovements(), m -> m.getMovementID().equals(id));
+        if (movement == null) {
+            throw new IllegalArgumentException("Movement not found.");
+        }
+        return movement;
+    }
+
+    /**
+     * Finds a driver from typed text. Throws with the reason if it is not a
+     * number or no driver has it.
+     */
+    public Driver findDriver(String text) {
+        String t = text == null ? "" : text.trim();
+        if (t.isEmpty()) {
+            throw new IllegalArgumentException("Enter a driver ID.");
+        }
+        int driverID;
+        try {
+            driverID = Integer.parseInt(t);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Please enter a valid number.");
+        }
+        Driver driver = dataStore.getBy(dataStore.getDrivers(), d -> d.getDriverID() == driverID);
+        if (driver == null) {
+            throw new IllegalArgumentException("Driver not found.");
+        }
+        return driver;
+    }
+
+    /**
+     * A staff member as "ID · Name", or just the ID when that staff member no
+     * longer exists.
+     */
+    public String staffLabel(String staffID) {
+        if (staffID == null) {
+            return "N/A";
+        }
+        Staff found = dataStore.getBy(dataStore.getStaff(), s -> s.getStaffID().equals(staffID));
+        return found == null ? staffID : staffID + " · " + found.getFName() + " " + found.getLName();
+    }
+
+    /**
+     * Open rentals that left from this location or are expected back to it,
+     * soonest return first. Throws if the staff member has no current location.
+     */
+    public List<RentalMovement> getOutOnRental(Location here) {
+        if (here == null) {
+            throw new IllegalArgumentException("You have no current location set.");
+        }
+        String hereID = here.getLocationID();
+        List<RentalMovement> open = new java.util.ArrayList<>();
+        for (Movement m : dataStore.getMovements()) {
+            if (m instanceof RentalMovement && m.getStatus() == MovementStatus.OPEN) {
+                RentalMovement rm = (RentalMovement) m;
+                boolean checkedOutHere = m.getCheckOutLoc().getLocationID().equals(hereID);
+                boolean returningHere = rm.getExpectedCILoc() != null
+                        && rm.getExpectedCILoc().getLocationID().equals(hereID);
+                if (checkedOutHere || returningHere) {
+                    open.add(rm);
+                }
+            }
+        }
+        open.sort(Comparator.comparing(RentalMovement::getExpectedCIDT)
+                .thenComparing(m -> m.getVehicle().getCategory()));
+        return open;
+    }
+
+    /**
+     * Every rental this staff member checked out, in movement ID order.
+     */
+    public List<RentalMovement> getStaffRentals(String staffID) {
+        List<RentalMovement> rentals = new java.util.ArrayList<>();
+        for (Movement m : dataStore.getMovements()) {
+            if (m instanceof RentalMovement && m.getCOStaff().equals(staffID)) {
+                rentals.add((RentalMovement) m);
+            }
+        }
+        rentals.sort(Comparator.comparingInt(m -> Integer.parseInt(m.getMovementID())));
+        return rentals;
     }
 }

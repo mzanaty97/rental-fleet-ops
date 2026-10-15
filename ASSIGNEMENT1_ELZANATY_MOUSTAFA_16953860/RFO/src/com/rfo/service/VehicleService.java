@@ -263,4 +263,28 @@ public class VehicleService {
                 return 1.0;
         }
     }
+
+    /**
+     * Every vehicle currently at this location, lowest odometer first.
+     */
+    public List<Vehicle> getLocationFleet(String locationID) {
+        List<Vehicle> fleet = dataStore.search(dataStore.getVehicles(),
+                v -> v.getCurrentLocation() != null && v.getCurrentLocation().getLocationID().equals(locationID));
+        fleet.sort(Comparator.comparingInt(Vehicle::getCurrentOdometer).thenComparing(Vehicle::getCategory));
+        return fleet;
+    }
+
+    /**
+     * Near new cars: available and 30 km or less on the odometer, grouped by
+     * location.
+     */
+    public List<Vehicle> getNewVehicles() {
+        List<Vehicle> cars = dataStore.search(dataStore.getVehicles(),
+                v -> v.getCurrentOdometer() <= 30 && v.getStatus().equals(VehicleStatus.AVAILABLE));
+        cars.sort(Comparator
+                .comparing((Vehicle v) -> v.getCurrentLocation() != null ? v.getCurrentLocation().getLocationID() : "")
+                .thenComparingInt(Vehicle::getCurrentOdometer)
+                .thenComparing(Vehicle::getPlateNumber));
+        return cars;
+    }
 }

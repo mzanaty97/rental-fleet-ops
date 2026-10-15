@@ -946,70 +946,15 @@ public class CheckoutView extends JPanel implements FullScreen {
      * or a click fills in the plate; Escape closes it.
      */
     public void showAvailableVehicles(List<String[]> rows) {
-        javax.swing.DefaultListModel<String[]> model = new javax.swing.DefaultListModel<>();
-        for (String[] r : rows) {
-            model.addElement(r);
-        }
-        JList<String[]> list = new JList<>(model);
-        list.setSelectedIndex(0);
-        list.setFixedCellHeight(34);
-        list.setCellRenderer(new javax.swing.ListCellRenderer<String[]>() {
-            @Override
-            public Component getListCellRendererComponent(JList<? extends String[]> l, String[] v, int i,
-                    boolean selected, boolean focus) {
-                JLabel row = new JLabel("<html><span style='font-family:monospace'><b>" + v[0] + "</b></span>"
-                        + " &nbsp; " + v[1] + " &nbsp;<span style='color:#4F5D75'>" + v[2] + " · " + v[3] + "</span></html>");
-                row.setFont(Theme.F_BODY);
-                row.setOpaque(true);
-                row.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
-                row.setBackground(selected ? Theme.PRIMARY_TINT : Theme.BG_SURFACE);
-                row.setForeground(Theme.TEXT_PRIMARY);
-                return row;
+        // the shared picker also closes itself when the screen is left, so it cannot float over the next screen
+        String heading = rows.size() + (rows.size() == 1 ? " vehicle" : " vehicles") + " available at " + fromName + ".";
+        VehiclePicker.show(plateBox, heading, rows, plate -> {
+            plateBox.setText(plate);
+            checkPlate();
+            if (vehicleStrip.isVisible()) {
+                driverBox.requestFocusInWindow();
             }
         });
-        javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
-        popup.setFocusable(true);
-        JLabel head = new JLabel(rows.size() + (rows.size() == 1 ? " vehicle" : " vehicles") + " available at "
-                + fromName + ". Pick one, or press Esc to type a plate.");
-        head.setFont(Theme.F_SMALL);
-        head.setForeground(Theme.TEXT_SECONDARY);
-        head.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        JScrollPane scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.BORDER_DIVIDER));
-        int listHeight = Math.min(rows.size(), 7) * 34 + 2;
-        JPanel box = new JPanel(new BorderLayout());
-        box.setBackground(Theme.BG_SURFACE);
-        box.add(head, BorderLayout.NORTH);
-        box.add(scroll, BorderLayout.CENTER);
-        box.setPreferredSize(new Dimension(520, listHeight + head.getPreferredSize().height));
-        popup.add(box);
-
-        Runnable choose = () -> {
-            String[] picked = list.getSelectedValue();
-            popup.setVisible(false);
-            if (picked != null) {
-                plateBox.setText(picked[0]);
-                checkPlate();
-                if (vehicleStrip.isVisible()) {
-                    driverBox.requestFocusInWindow();
-                }
-            }
-        };
-        key(list, java.awt.event.KeyEvent.VK_ENTER, choose);
-        key(list, java.awt.event.KeyEvent.VK_ESCAPE, () -> {
-            popup.setVisible(false);
-            plateBox.requestFocusInWindow();
-        });
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                list.setSelectedIndex(list.locationToIndex(e.getPoint()));
-                choose.run();
-            }
-        });
-        popup.show(plateBox, 0, plateBox.getHeight() + 2);
-        javax.swing.SwingUtilities.invokeLater(() -> list.requestFocusInWindow());
     }
 
     public void setFromName(String name) {

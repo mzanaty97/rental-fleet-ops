@@ -90,6 +90,29 @@ public final class VehiclePicker {
                 choose.run();
             }
         });
+        // the list is a separate little window, so close it when the screen under it is no longer on show
+        // (for example the user pressed Back), otherwise it stays floating over the next screen
+        java.awt.event.HierarchyListener closer = e -> {
+            if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && !anchor.isShowing()) {
+                popup.setVisible(false);
+            }
+        };
+        anchor.addHierarchyListener(closer);
+        popup.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
+                anchor.removeHierarchyListener(closer);
+            }
+
+            @Override
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
+                anchor.removeHierarchyListener(closer);
+            }
+        });
         popup.show(anchor, 0, anchor.getHeight() + 2);
         SwingUtilities.invokeLater(() -> list.requestFocusInWindow());
     }

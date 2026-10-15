@@ -6,6 +6,7 @@ import com.rfo.model.Movement;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Staff;
 import com.rfo.service.DataStore;
+import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
@@ -13,10 +14,12 @@ import java.util.Scanner;
 public class MovementDetailsMenu extends Menu {
 
     private StaffService staffService;
+    private MovementService movementService;
 
     public MovementDetailsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
         this.staffService = new StaffService(dataStore);
+        this.movementService = new MovementService(dataStore);
     }
 
     @Override
@@ -48,11 +51,11 @@ public class MovementDetailsMenu extends Menu {
         System.out.print("Movement ID: ");
         String movementID = scanner.nextLine();
 
-        Movement movement = dataStore.getBy(dataStore.getMovements(),
-                m -> m.getMovementID().equals(movementID));
-
-        if (movement == null) {
-            System.out.println("Movement not found.");
+        Movement movement;
+        try {
+            movement = movementService.findMovement(movementID);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
@@ -88,18 +91,11 @@ public class MovementDetailsMenu extends Menu {
         System.out.print("Driver ID: ");
         String input = scanner.nextLine();
 
-        int driverID;
+        Driver driver;
         try {
-            driverID = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number.");
-            return;
-        }
-
-        Driver driver = dataStore.getBy(dataStore.getDrivers(), d -> d.getDriverID() == driverID);
-
-        if (driver == null) {
-            System.out.println("Driver not found.");
+            driver = movementService.findDriver(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
