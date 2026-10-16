@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Amend Rental screen: type a movement ID or plate, press Find rental, and
  * a card shows the open rental's current return and estimate. Under it the user

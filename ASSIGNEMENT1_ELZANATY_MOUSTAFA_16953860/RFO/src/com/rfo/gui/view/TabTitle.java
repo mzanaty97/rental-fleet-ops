@@ -25,6 +25,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * What a tab looks like. It paints its own background: navy when idle, a
  * lighter navy when the mouse is over it, and the pale window colour with a

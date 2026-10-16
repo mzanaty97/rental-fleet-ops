@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude. I designed the structure and logic
+// (following my Part 1 design); Claude wrote the repeated methods and boilerplate.
 /**
  * DAO replacement for DriverFileHandler. Same public contract as the file-based
  * version, now backed by the DRIVERS table.

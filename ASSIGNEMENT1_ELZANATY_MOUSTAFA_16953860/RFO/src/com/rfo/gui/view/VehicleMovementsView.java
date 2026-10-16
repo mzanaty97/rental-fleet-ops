@@ -22,6 +22,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Show Vehicle Movements screen: type a rego, press Show, and a table lists
  * every movement of that vehicle, newest first. The view only shows the rows

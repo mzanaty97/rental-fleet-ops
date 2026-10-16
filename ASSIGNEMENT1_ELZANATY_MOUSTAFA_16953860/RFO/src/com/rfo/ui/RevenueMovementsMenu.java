@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for rentals: checkout, check in, close rental, amend rental,
+ * changeover and print invoice.
+ */
 public class RevenueMovementsMenu extends Menu {
 
     private DataStore dataStore;
@@ -168,6 +173,7 @@ public class RevenueMovementsMenu extends Menu {
     }
 
     // changes the expected return of an open rental
+    // Generated with assistance from Claude: console version of Amend Rental.
     private void amendRental() {
         System.out.print("Movement ID or plate number: ");
         String idOrPlate = scanner.nextLine();
@@ -189,6 +195,7 @@ public class RevenueMovementsMenu extends Menu {
     }
 
     // shows the saved invoice of a closed rental (the GUI can also save it as a PDF)
+    // Generated with assistance from Claude: console version of printing an invoice.
     private void printInvoice() {
         System.out.print("Movement ID or plate number: ");
         String idOrPlate = scanner.nextLine();

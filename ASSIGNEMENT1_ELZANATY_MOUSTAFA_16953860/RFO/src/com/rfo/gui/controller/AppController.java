@@ -15,6 +15,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for the main window. Opens a login tab when New Session is
  * pressed, turns it into a session tab after a successful login, sends it back

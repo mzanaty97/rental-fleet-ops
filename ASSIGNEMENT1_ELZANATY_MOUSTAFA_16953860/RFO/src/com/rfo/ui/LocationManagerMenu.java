@@ -8,6 +8,10 @@ import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The console menu for location managers. Opens the manage staff and manage locations
+ * menus.
+ */
 public class LocationManagerMenu extends Menu {
 
     private StaffService service;

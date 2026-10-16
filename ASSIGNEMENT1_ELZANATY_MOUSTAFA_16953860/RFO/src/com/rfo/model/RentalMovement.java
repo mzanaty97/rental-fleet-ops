@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A rental movement (ORA): a driven movement with an insurance tier, optional RSA and
+ * extra equipment. Works out the price from the number of days, the rates and the extras.
+ */
 public class RentalMovement extends DrivenMovement {
 
     private static final double RSA_DAILY_RATE = 9.0;
@@ -98,6 +102,7 @@ public class RentalMovement extends DrivenMovement {
         return insuranceCost + rsaCost;
     }
 
+    // Generated with assistance from Claude: holds a price worked out in parts (days, base, insurance, RSA, equipment, total).
     /**
      * A price worked out before the rental exists: the days, and what each part
      * of the price comes to.
@@ -121,6 +126,7 @@ public class RentalMovement extends DrivenMovement {
         }
     }
 
+    // Generated with assistance from Claude: prices a rental before it exists, using the same rules as the real estimate.
     /**
      * Prices a rental that has not started yet (no equipment), using the same
      * rules as the real estimate.
@@ -133,6 +139,7 @@ public class RentalMovement extends DrivenMovement {
         return new Quote(days, base, insurance, rsaCost, 0.0);
     }
 
+    // Generated with assistance from Claude: breaks the final price into its parts so the invoice can show them.
     /**
      * What each part of the price came to once the rental was checked in (days,
      * base, insurance, RSA, equipment). The total matches
@@ -146,10 +153,12 @@ public class RentalMovement extends DrivenMovement {
         return new Quote(days, base, insurance, rsaCost, calculateEquipmentCost(days));
     }
 
+    // Generated with assistance from Claude: (modified existing method) now delegates to estimateFor().
     public double getRentalEstimate() {
         return estimateFor(expectedCIDT);
     }
 
+    // Generated with assistance from Claude: previews the price if the rental is returned at a given time (used by Amend Rental).
     /**
      * What the rental would cost if it were returned at the given time (used to
      * preview an amendment).

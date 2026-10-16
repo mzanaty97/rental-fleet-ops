@@ -13,6 +13,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.Icon;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Small line icons drawn with Java2D, so the app needs no image files. Every
  * icon is designed on a 20 x 20 grid and scaled to the size you ask for.

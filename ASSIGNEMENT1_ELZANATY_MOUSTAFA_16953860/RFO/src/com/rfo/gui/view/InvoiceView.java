@@ -19,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Print Invoice screen: type a movement ID or plate, press Find invoice,
  * and the saved invoice shows as a card. The Print button asks where to put the

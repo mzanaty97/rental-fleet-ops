@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A wrapping row of small pills, each showing a bold location ID and its name.
  * Used for "Can already use" (grey) and "Access that will be removed" (red). It

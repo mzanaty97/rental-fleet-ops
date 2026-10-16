@@ -26,6 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The New Vehicle form: plate, year, make, model, category, fuel and GPS. The
  * Add button stays off until plate, year, make and model are filled in. It only

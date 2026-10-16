@@ -2,6 +2,8 @@ package com.rfo.model;
 
 import java.time.LocalDateTime;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A saved invoice for one closed rental. Everything is copied in as plain
  * values when the invoice is made (a snapshot), so reprinting it later always

@@ -24,6 +24,8 @@ import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Add Staff form: ID, password, first and last name, and a role picked from
  * four chips. The Add button stays off until everything is filled in. The last

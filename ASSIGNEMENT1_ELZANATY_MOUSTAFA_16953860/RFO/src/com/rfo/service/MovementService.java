@@ -18,6 +18,13 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+// Generated with assistance from Claude (modified existing class): I wrote this class in Part 1; Claude helped me move more of the business rules into it in Part 2 (see the method notes) so the GUI and the console menus share them.
+/**
+ * Business rules for movements: checking vehicles out, checking them in, closing rentals,
+ * amending rentals, quoting prices and listing a vehicle's movement history. Input is
+ * checked here and problems are reported with IllegalArgumentException, so the console
+ * menus and the GUI screens show the same messages.
+ */
 public class MovementService {
 
     private DataStore dataStore;
@@ -26,6 +33,7 @@ public class MovementService {
         this.dataStore = dataStore;
     }
 
+    // Generated with assistance from Claude: lists the vehicles that can be used for a non-revenue movement.
     /**
      * The vehicles at a location that are free to be moved (transfer or
      * workshop): there and available.
@@ -41,6 +49,7 @@ public class MovementService {
         return found;
     }
 
+    // Generated with assistance from Claude: lists the vehicles that can be rented out at a location.
     /**
      * The vehicles that could be rented out right now from a location: there,
      * available and not due for service.
@@ -56,6 +65,7 @@ public class MovementService {
         return found;
     }
 
+    // Generated with assistance from Claude: finds and checks the vehicle chosen for a rental.
     /**
      * Finds the vehicle for a checkout and checks it can be rented from the
      * given location. Throws with the reason if it cannot.
@@ -87,6 +97,7 @@ public class MovementService {
         return vehicle;
     }
 
+    // Generated with assistance from Claude: turns the typed driver ID into a number or explains what is wrong.
     /**
      * Turns typed text into a driver ID. Throws with the reason if it is not a
      * positive number.
@@ -107,6 +118,7 @@ public class MovementService {
         }
     }
 
+    // Generated with assistance from Claude: checks that the expected return is in the future.
     /**
      * The expected return must be a real date and time in the future.
      */
@@ -119,6 +131,7 @@ public class MovementService {
         }
     }
 
+    // Generated with assistance from Claude: prices a rental before it starts.
     /**
      * The price of a rental starting now and returning at the given time.
      * Nothing is saved.
@@ -127,6 +140,7 @@ public class MovementService {
         return RentalMovement.quote(vehicle, LocalDateTime.now(), expectedReturn, rsa, tier);
     }
 
+    // Generated with assistance from Claude: finds an open location by ID.
     /**
      * Finds an active location by ID. Throws with the reason if there is none.
      */
@@ -173,6 +187,7 @@ public class MovementService {
         return rental;
     }
 
+    // Generated with assistance from Claude: finds the movement a user wants to check in.
     /**
      * Finds a movement that is OPEN and can be checked in: a rental, a car
      * transfer or a workshop job. The text can be a movement ID or a plate
@@ -187,6 +202,7 @@ public class MovementService {
         return movement;
     }
 
+    // Generated with assistance from Claude: finds the movement a user wants to close.
     /**
      * Finds a movement that has been checked in and can be closed (rental, car
      * transfer or workshop job). The text can be a movement ID or a plate
@@ -200,6 +216,7 @@ public class MovementService {
         return movement;
     }
 
+    // Generated with assistance from Claude: finds an open rental to amend.
     /**
      * Finds a rental that can still be amended: it must be OPEN (not yet
      * checked in). The text can be a movement ID or a plate number. Throws with
@@ -216,6 +233,7 @@ public class MovementService {
         return (RentalMovement) movement;
     }
 
+    // Generated with assistance from Claude: holds the before and after price when a rental is amended.
     /**
      * What an amendment would change, worked out and checked but not saved.
      * Shown on the confirm card.
@@ -227,6 +245,7 @@ public class MovementService {
         public final double oldEstimate;
         public final double newEstimate;
 
+        // Generated with assistance from Claude: builds the amend preview.
         private AmendPreview(LocalDateTime newReturn, Location newLocation, double oldEstimate, double newEstimate) {
             this.newReturn = newReturn;
             this.newLocation = newLocation;
@@ -235,6 +254,7 @@ public class MovementService {
         }
     }
 
+    // Generated with assistance from Claude: works out the new price before an open rental is amended.
     /**
      * Checks a proposed change to an open rental's expected return and works
      * out the new estimate, without saving anything. The date is typed text
@@ -260,6 +280,7 @@ public class MovementService {
         return new AmendPreview(newReturn, newLoc, rental.getRentalEstimate(), rental.estimateFor(newReturn));
     }
 
+    // Generated with assistance from Claude: changes the expected return of an open rental.
     /**
      * Applies an amendment after every check in previewAmend has passed, and
      * saves it. Throws with the reason if not.
@@ -270,6 +291,7 @@ public class MovementService {
         dataStore.saveMovements();
     }
 
+    // Generated with assistance from Claude: gives a movement's type as a word.
     /**
      * A short name for the kind of movement, for screens and messages.
      */
@@ -286,6 +308,7 @@ public class MovementService {
         return "Movement";
     }
 
+    // Generated with assistance from Claude: finds a driven movement by ID or rego and checks it is in the status the action needs.
     /**
      * Looks for a movement with this ID first, then for a movement of the
      * vehicle with this plate in the wanted status.
@@ -315,6 +338,7 @@ public class MovementService {
         throw new IllegalArgumentException("No movement found for that movement ID or plate number.");
     }
 
+    // Generated with assistance from Claude: checks in a driven movement.
     /**
      * Checks a movement in at the staff member's location. Throws with the
      * reason if it cannot be.
@@ -328,6 +352,7 @@ public class MovementService {
         return movement;
     }
 
+    // Generated with assistance from Claude: turns the typed odometer reading into a number and checks it is not below the check-out reading.
     /**
      * Turns the typed odometer into a number. It must be digits only and not
      * lower than at checkout.
@@ -344,6 +369,7 @@ public class MovementService {
         return odo;
     }
 
+    // Generated with assistance from Claude: finds and checks the vehicle chosen for a non-revenue movement.
     /**
      * Finds the vehicle for a car transfer or a workshop run and checks it is
      * at the given location and free to move. Throws with the reason if it is
@@ -415,6 +441,7 @@ public class MovementService {
         return ctm;
     }
 
+    // Generated with assistance from Claude: finds the location used by a non-revenue movement.
     private Location findLocationForNonRevenue(String locationID) {
         Location loc = locationID == null ? null : dataStore.getBy(dataStore.getLocations(),
                 l -> l.getLocationID().equals(locationID.trim().toUpperCase()));
@@ -424,6 +451,7 @@ public class MovementService {
         return loc;
     }
 
+    // Generated with assistance from Claude: validates the drivers and the expected check-in location of a driven movement.
     private Location checkDrivenDetails(List<Integer> driverIDs, String expectedCILocID) {
         if (driverIDs == null || driverIDs.isEmpty()) {
             throw new IllegalArgumentException("At least one driver is required.");
@@ -432,6 +460,7 @@ public class MovementService {
         return findActiveLocation(expectedCILocID);
     }
 
+    // Generated with assistance from Claude: checks every driver ID exists.
     /**
      * Every driver ID on a movement must belong to a real driver.
      */
@@ -453,6 +482,7 @@ public class MovementService {
         dataStore.saveMovements();
     }
 
+    // Generated with assistance from Claude: gives the screens access to the driver service.
     /**
      * The rules for creating a driver, which share this service's data.
      */
@@ -460,6 +490,7 @@ public class MovementService {
         return new DriverService(dataStore);
     }
 
+    // Generated with assistance from Claude: gives the screens access to the invoice service.
     /**
      * The invoice rules, which share this service's data (a rental's invoice is
      * made when it closes).
@@ -495,6 +526,7 @@ public class MovementService {
     }
 
     // ---- Lookups and reports (used by the Movement Details and Reports screens) ----
+    // Generated with assistance from Claude: finds a movement by its ID.
     /**
      * Finds a movement by its ID. Throws with the reason if the text is empty
      * or nothing matches.
@@ -511,6 +543,7 @@ public class MovementService {
         return movement;
     }
 
+    // Generated with assistance from Claude: finds a driver from the text typed in.
     /**
      * Finds a driver from typed text. Throws with the reason if it is not a
      * number or no driver has it.
@@ -533,6 +566,7 @@ public class MovementService {
         return driver;
     }
 
+    // Generated with assistance from Claude: formats a staff member for display.
     /**
      * A staff member as "ID · Name", or just the ID when that staff member no
      * longer exists.
@@ -545,6 +579,7 @@ public class MovementService {
         return found == null ? staffID : staffID + " · " + found.getFName() + " " + found.getLName();
     }
 
+    // Generated with assistance from Claude: lists the rentals that are out from a location.
     /**
      * Open rentals that left from this location or are expected back to it,
      * soonest return first. Throws if the staff member has no current location.
@@ -571,6 +606,7 @@ public class MovementService {
         return open;
     }
 
+    // Generated with assistance from Claude: lists the rentals a staff member checked out.
     /**
      * Every rental this staff member checked out, in movement ID order.
      */
@@ -586,6 +622,7 @@ public class MovementService {
     }
 
     // ---- Vehicle movement history (Show Vehicle Movements) ----
+    // Generated with assistance from Claude: one row of a vehicle's movement history.
     /**
      * One line of a vehicle's history. The check-in values of a movement that
      * has not been checked in yet are the expected ones (expected is true) and
@@ -619,6 +656,7 @@ public class MovementService {
         }
     }
 
+    // Generated with assistance from Claude: gives a movement's code (ORA, CTM, WSM, NVM, DVM).
     /**
      * The short code for a movement: ORA rental, CTM car transfer, WSM
      * workshop, NVM new vehicle, DVM defleet.
@@ -642,6 +680,7 @@ public class MovementService {
         return "???";
     }
 
+    // Generated with assistance from Claude: lists all movements of a vehicle, newest first (Show Vehicle Movements).
     /**
      * Every movement of the vehicle with this plate, newest first (so the NVM
      * that brought it into the fleet is last). Throws with the reason if the
@@ -687,6 +726,7 @@ public class MovementService {
         return rows;
     }
 
+    // Generated with assistance from Claude: turns a movement ID into a number so movements can be sorted.
     private int idNumber(String movementID) {
         try {
             return Integer.parseInt(movementID);

@@ -1,5 +1,9 @@
 package com.rfo.model;
 
+/**
+ * A vehicle in the fleet: its details, category, rate, odometer, location, status and
+ * service state. Implements Rentable and Serviceable and is Comparable by rate.
+ */
 public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
 
     private static double baseDailyRate = 50.0;
@@ -106,6 +110,7 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
         this.lastServiceOdometer = lastServiceOdometer;
     }
 
+    // Generated with assistance from Claude: (modified existing method) shows SERVICE_DUE for an available vehicle that is overdue for service.
     /**
      * The status shown to the user: an available vehicle that is overdue for
      * service shows as SERVICE_DUE.
@@ -146,6 +151,7 @@ public class Vehicle implements Rentable, Serviceable, Comparable<Vehicle> {
         }
     }
 
+    // Generated with assistance from Claude: (modified existing method) a vehicle overdue for service is not available to rent.
     @Override
     public boolean isAvailable() {
         // a vehicle that is overdue for service cannot be rented, so it is not available

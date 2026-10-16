@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Helper methods shared by the console movement menus, such as asking for driver IDs and
+ * for a date and time.
+ */
 public class MovementMenuUtils {
 
     public static List<Integer> promptForDriverIDs(Scanner scanner) {

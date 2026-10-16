@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Part 1 text-file storage for locations (data/locations.txt). In Part 2 it is only used
+ * to fill an empty database the first time the app runs; LocationDAO does the saving now.
+ */
 public class LocationFileHandler {
 
     private static final String FILE_PATH = "data/locations.txt";

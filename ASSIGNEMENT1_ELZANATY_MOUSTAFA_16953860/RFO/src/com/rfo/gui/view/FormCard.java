@@ -7,6 +7,8 @@ import java.awt.Insets;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A white rounded card with a fixed width, used for forms and detail panels.
  * Children stack downwards.

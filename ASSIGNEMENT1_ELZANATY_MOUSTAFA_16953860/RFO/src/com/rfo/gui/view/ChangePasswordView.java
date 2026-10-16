@@ -13,6 +13,8 @@ import javax.swing.JPasswordField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Change Password form: current password, then the new one twice. Each box
  * can show its own red error. Enter moves to the next box and Enter in the last

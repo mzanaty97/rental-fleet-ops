@@ -23,6 +23,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The New driver pop-up used by Checkout, Car Transfer and Workshop when the
  * customer is not in the system yet. It is a form with the driver's details;

@@ -27,6 +27,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * One logged-in session (one tab). A white header shows who is logged in
  * (initials, name, staff ID, role badge), the current location and a Log out

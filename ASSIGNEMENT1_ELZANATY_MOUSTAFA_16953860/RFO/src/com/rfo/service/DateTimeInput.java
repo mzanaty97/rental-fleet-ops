@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Turns typed dates and times into real ones. A date can be typed in many ways:
  * 181026, 18102026, 1810261000, 181020261000, 18.10.26 10:00, 18/10/2026 and so

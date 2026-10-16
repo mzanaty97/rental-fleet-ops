@@ -6,6 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+// Generated with assistance from Claude. I designed the structure and logic
+// (following my Part 1 design); Claude wrote the repeated methods and boilerplate.
+/**
+ * Singleton that owns the one embedded Derby connection for the whole app. It creates the
+ * database and any missing tables the first time it is used, so no set-up is needed.
+ */
 public class DBConnection {
 
     private static final String DB_URL = "jdbc:derby:db/rfodb;create=true";

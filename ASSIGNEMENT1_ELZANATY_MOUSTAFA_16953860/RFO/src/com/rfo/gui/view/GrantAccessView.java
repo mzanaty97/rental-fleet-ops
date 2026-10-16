@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Grant Location Access: pick a staff member, see the locations they can
  * already use, then pick one more from the active locations they cannot use

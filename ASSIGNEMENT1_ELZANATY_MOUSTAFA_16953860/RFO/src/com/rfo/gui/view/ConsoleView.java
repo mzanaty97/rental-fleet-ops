@@ -35,6 +35,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The message console at the bottom of a session. At rest it is one slim line
  * showing the newest message, with an icon and a word (OK, ERROR, WARNING,

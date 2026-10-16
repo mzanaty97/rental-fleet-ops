@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+// Generated with assistance from Claude (modified existing class): I wrote this class in Part 1; Claude helped me move more of the business rules into it in Part 2 (see the method notes) so the GUI and the console menus share them.
+/**
+ * Business rules for vehicles: adding, finding, listing, changing the status of and
+ * defleeting vehicles, with checks on the plate and year. Problems are reported with
+ * IllegalArgumentException.
+ */
 public class VehicleService {
 
     private DataStore dataStore;
@@ -23,6 +29,7 @@ public class VehicleService {
      */
     public static final int MIN_YEAR = 1990;
 
+    // Generated with assistance from Claude: checks whether a plate is already in the fleet.
     /**
      * True when a vehicle with this plate is already in the fleet (defleeted
      * ones count too).
@@ -32,6 +39,7 @@ public class VehicleService {
         return dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate)) != null;
     }
 
+    // Generated with assistance from Claude: checks the plate format and returns it tidied up.
     /**
      * Checks a plate for a new vehicle: letters and digits only, 2 to 8
      * characters, not already used.
@@ -50,6 +58,7 @@ public class VehicleService {
         return plate;
     }
 
+    // Generated with assistance from Claude: turns the typed year into a number and checks it is sensible.
     /**
      * Turns the typed year into a number. Throws with the reason if it is not a
      * sensible model year.
@@ -104,6 +113,7 @@ public class VehicleService {
         return newVehicle;
     }
 
+    // Generated with assistance from Claude: lists the vehicles that can be defleeted.
     /**
      * The vehicles that could be defleeted: not already defleeted and not out
      * on a movement.
@@ -116,6 +126,7 @@ public class VehicleService {
         return found;
     }
 
+    // Generated with assistance from Claude: finds and checks the vehicle chosen to defleet.
     /**
      * Finds a vehicle that can be defleeted: it must exist, not already be
      * defleeted, and not be out.
@@ -139,6 +150,7 @@ public class VehicleService {
         return vehicle;
     }
 
+    // Generated with assistance from Claude: (modified existing method) now returns the vehicle and throws IllegalArgumentException instead of returning a boolean.
     /**
      * Defleets a vehicle. Throws with the reason if it cannot be.
      */
@@ -157,6 +169,7 @@ public class VehicleService {
     }
 
     // available vehicles, optionally for one category (null = every category)
+    // Generated with assistance from Claude: lists the vehicles that can be rented, optionally for one category.
     public List<Vehicle> getAvailableVehicles(VehicleCategory category) {
         List<Vehicle> available = dataStore.search(dataStore.getVehicles(), Vehicle::isAvailable);
 
@@ -178,6 +191,7 @@ public class VehicleService {
     }
 
     // vehicles flagged as due for service, optionally for one category
+    // Generated with assistance from Claude: lists the vehicles that are due for service.
     public List<Vehicle> getServiceDueVehicles(VehicleCategory category) {
         List<Vehicle> due = dataStore.search(dataStore.getVehicles(), Vehicle::isDueForService);
 
@@ -188,6 +202,7 @@ public class VehicleService {
     }
 
     // the whole fleet, optionally for one category
+    // Generated with assistance from Claude: lists vehicles, optionally for one category.
     public List<Vehicle> getAllVehicles(VehicleCategory category) {
         List<Vehicle> all = dataStore.search(dataStore.getVehicles(),
                 v -> category == null || v.getCategory() == category);
@@ -197,6 +212,7 @@ public class VehicleService {
         return all;
     }
 
+    // Generated with assistance from Claude: lists the statuses a user may set by hand.
     /**
      * The statuses a person may set by hand. IN_USE is left out because only a
      * rental movement puts a vehicle in use.
@@ -211,6 +227,7 @@ public class VehicleService {
         return statuses;
     }
 
+    // Generated with assistance from Claude: changes a vehicle's status.
     /**
      * Changes the status of the vehicle with the given plate and saves it.
      *
@@ -264,6 +281,7 @@ public class VehicleService {
         }
     }
 
+    // Generated with assistance from Claude: lists the vehicles at a location.
     /**
      * Every vehicle currently at this location, lowest odometer first.
      */
@@ -274,6 +292,7 @@ public class VehicleService {
         return fleet;
     }
 
+    // Generated with assistance from Claude: lists the vehicles that have not moved yet.
     /**
      * Near new cars: available and 30 km or less on the odometer, grouped by
      * location.

@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * DAO for the INVOICES table. An invoice is a saved snapshot and is never
  * changed once written, so saveAll only inserts invoices that are not in the

@@ -9,6 +9,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Makes any screen or menu scrollable when the window is too short for it. The
  * content keeps filling the window as before; only when the window is shorter

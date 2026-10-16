@@ -1,5 +1,8 @@
 package com.rfo.model;
 
+/**
+ * Optional rental equipment, each item with its own daily rate.
+ */
 public enum Equipment {
     CHILD_SEAT(16.5),
     ADDITIONAL_DRIVER(10.0),

@@ -10,6 +10,8 @@ import com.rfo.service.StaffService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for Change Location. Fills the list from the staff member's
  * accessible locations, switches the working location through the StaffService

@@ -18,6 +18,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+// Generated with assistance from Claude (modified existing class): I wrote this class in Part 1; Claude helped me move more of the business rules into it in Part 2 (see the method notes) so the GUI and the console menus share them.
+/**
+ * Holds the lists of drivers, locations, movements, staff, vehicles and invoices in
+ * memory, loads them through the DAOs when the app starts and saves them back. The
+ * screens tell it to notify listeners when the data changes.
+ */
 public class DataStore {
 
     private List<Driver> drivers = new ArrayList<>();
@@ -49,14 +55,17 @@ public class DataStore {
         this.invoices = invoiceDAO.loadAll();
     }
 
+    // Generated with assistance from Claude: registers a listener that wants to hear about data changes (MVC).
     public void addListener(ModelListener listener) {
         listeners.add(listener);
     }
 
+    // Generated with assistance from Claude: unregisters a listener.
     public void removeListener(ModelListener listener) {
         listeners.remove(listener);
     }
 
+    // Generated with assistance from Claude: tells every registered listener that the data changed.
     private void notifyListeners() {
         for (ModelListener listener : listeners) {
             listener.onModelChanged();
@@ -108,11 +117,13 @@ public class DataStore {
         return this.movements;
     }
 
+    // Generated with assistance from Claude: saves the invoices through InvoiceDAO.
     public void saveInvoices() {
         invoiceDAO.saveAll(invoices);
         notifyListeners();
     }
 
+    // Generated with assistance from Claude: gives access to the saved invoices.
     public List<Invoice> getInvoices() {
         return this.invoices;
     }

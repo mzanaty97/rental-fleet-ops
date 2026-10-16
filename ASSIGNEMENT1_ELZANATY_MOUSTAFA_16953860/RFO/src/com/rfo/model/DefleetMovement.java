@@ -2,6 +2,10 @@ package com.rfo.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * A defleet movement (DVM): retires a vehicle from the fleet. It is checked in at the
+ * retail depot and closed straight away.
+ */
 public class DefleetMovement extends Movement {
 
     public static final Location RETAIL_DEPOT = new Location("AKLC88", "Auckland Retail Depot", null);

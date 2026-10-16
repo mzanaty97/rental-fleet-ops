@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A one-off tool that fills the database with sample data for testing and for
  * the demo video. Run this class once (it has its own main method). It adds: -

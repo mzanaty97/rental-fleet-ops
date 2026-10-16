@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Check In screen (rentals, car transfers and workshop jobs): type a
  * movement ID or plate, press Check in, and a result card shows where the

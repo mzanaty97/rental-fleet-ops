@@ -44,6 +44,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Checkout screen. One screen with three steps: the form (vehicle, drivers,
  * return, cover) with a live summary beside it, then a confirm card, then a

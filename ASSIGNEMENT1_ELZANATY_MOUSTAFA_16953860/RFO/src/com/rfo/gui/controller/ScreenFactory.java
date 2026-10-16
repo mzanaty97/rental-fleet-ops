@@ -31,6 +31,8 @@ import com.rfo.service.StaffService;
 import com.rfo.service.VehicleService;
 import javax.swing.JComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Factory for feature screens. Given the name of a menu option it builds the
  * matching screen together with its controller. Options that are not built yet

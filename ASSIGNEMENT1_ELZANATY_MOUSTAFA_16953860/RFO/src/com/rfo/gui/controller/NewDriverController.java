@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.function.IntConsumer;
 import javax.swing.SwingUtilities;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for the New driver pop-up. It asks the DriverService to check the
  * typed details, shows any problems next to their boxes, and when everything is

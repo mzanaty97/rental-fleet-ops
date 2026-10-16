@@ -11,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Writes one invoice as a one-page A4 PDF. No library is used: a PDF is a text
  * file made of numbered objects (the catalog, the page, two fonts and the

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Generated with assistance from Claude. I designed the structure and logic
+// (following my Part 1 design); Claude wrote the repeated methods and boilerplate.
 /**
  * DAO replacement for VehicleFileHandler. Same public contract as the
  * file-based version, now backed by the VEHICLES table.

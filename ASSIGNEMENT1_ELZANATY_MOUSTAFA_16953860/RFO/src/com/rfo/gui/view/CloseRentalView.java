@@ -30,6 +30,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Close Rental screen in two steps: return details (movement ID and the
  * odometer at check in), then payment (the final cost to take from the

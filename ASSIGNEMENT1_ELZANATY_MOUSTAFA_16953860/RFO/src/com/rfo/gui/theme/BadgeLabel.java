@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A small pill with coloured text, used for roles, statuses and "COMING SOON".
  * The text itself is the lookup key into {@link Theme#badge(String)}, so the

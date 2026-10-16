@@ -7,6 +7,10 @@ import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console admin menu: change location, change password and similar.
+ */
 public class AdminMenu extends Menu {
 
     private StaffService service;

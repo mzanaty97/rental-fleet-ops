@@ -12,6 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A search row used by the lookup screens: a labelled text box, a button, and a
  * small help line. Pressing Enter in the box presses the button. Errors show

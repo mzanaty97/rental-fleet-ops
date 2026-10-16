@@ -12,6 +12,11 @@ import com.rfo.service.VehicleService;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console reports menu: out on rental, location fleet, new vehicles and staff rental
+ * reports.
+ */
 public class ReportsMenu extends Menu {
 
     private StaffService staffService;

@@ -21,6 +21,8 @@ import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Styles every JTable: 40 px rows, zebra stripes, a hover row, a soft teal
  * selection, a flat header, right-aligned numbers with thousands separators,

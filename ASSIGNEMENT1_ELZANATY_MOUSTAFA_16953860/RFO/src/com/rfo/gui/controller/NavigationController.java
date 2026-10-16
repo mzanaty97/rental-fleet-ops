@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Walks a session's menu tree. For every menu entry it adds a menu screen to
  * the session, for every leaf a feature screen (built by the ScreenFactory)

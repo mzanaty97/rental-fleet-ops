@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Part 1 text-file storage for drivers (data/drivers.txt). In Part 2 it is only used to
+ * fill an empty database the first time the app runs; DriverDAO does the saving now.
+ */
 public class DriverFileHandler {
 
     private static final String FILE_PATH = "data/drivers.txt";

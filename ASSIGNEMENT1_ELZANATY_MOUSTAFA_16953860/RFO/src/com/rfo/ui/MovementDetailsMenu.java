@@ -12,6 +12,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for looking up movement details, drivers and a vehicle's movements.
+ */
 public class MovementDetailsMenu extends Menu {
 
     private StaffService staffService;
@@ -91,6 +95,7 @@ public class MovementDetailsMenu extends Menu {
         }
     }
 
+    // Generated with assistance from Claude: console version of Show Vehicle Movements.
     private void showVehicleMovements() {
         System.out.print("Rego: ");
         String rego = scanner.nextLine();

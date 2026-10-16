@@ -2,6 +2,9 @@ package com.rfo.service;
 
 import com.rfo.model.Staff;
 
+/**
+ * Checks a staff ID and password at login and returns the matching staff member.
+ */
 public class AuthService {
 
     private DataStore dataStore;

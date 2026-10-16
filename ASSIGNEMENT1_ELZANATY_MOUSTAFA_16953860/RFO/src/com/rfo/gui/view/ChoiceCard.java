@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JToggleButton;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * One choice in a row of cards, with a bold title and a small line under it.
  * The chosen one gets a teal outline and a tick.

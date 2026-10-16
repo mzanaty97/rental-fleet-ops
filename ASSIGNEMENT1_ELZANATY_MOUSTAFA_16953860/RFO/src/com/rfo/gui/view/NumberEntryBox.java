@@ -11,6 +11,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The small box under a menu that shows the number being typed before Enter is
  * pressed. Quiet and dashed when nothing is typed, dark navy with white digits

@@ -23,6 +23,8 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The small list of vehicles that drops down under a plate box when Enter is
  * pressed on an empty box. Each row is {plate, make and model, category,

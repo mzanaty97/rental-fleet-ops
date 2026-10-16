@@ -3,6 +3,10 @@ package com.rfo.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * A car transfer movement (CTM): a driven movement that moves a vehicle from one location
+ * to another. It is checked out with a driver and an expected check-in location and time.
+ */
 public class CarTransferMovement extends DrivenMovement {
 
     // new movement

@@ -6,6 +6,12 @@ import com.rfo.model.StaffRole;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude (modified existing class): I wrote this class in Part 1; Claude helped me move more of the business rules into it in Part 2 (see the method notes) so the GUI and the console menus share them.
+/**
+ * Business rules for staff: login-related changes, passwords, which locations a staff
+ * member can use, and granting or revoking access. Problems are reported with
+ * IllegalArgumentException.
+ */
 public class StaffService {
 
     private DataStore dataStore;
@@ -33,6 +39,7 @@ public class StaffService {
         return getMenuOptions(role).contains(action);
     }
 
+    // Generated with assistance from Claude: lists all staff.
     /**
      * Everyone on record, in file order.
      */
@@ -43,6 +50,7 @@ public class StaffService {
     /**
      * The staff member with this ID (any letter case), or null.
      */
+    // Generated with assistance from Claude: lists the staff whose location access can be changed.
     /**
      * Everyone whose location access can be changed: managers are left out
      * because they can use every location.
@@ -57,11 +65,13 @@ public class StaffService {
         return list;
     }
 
+    // Generated with assistance from Claude: finds a staff member by ID.
     public Staff findStaff(String staffID) {
         String wanted = staffID == null ? "" : staffID.trim().toUpperCase();
         return dataStore.getBy(dataStore.getStaff(), s -> s.getStaffID().equals(wanted));
     }
 
+    // Generated with assistance from Claude: lists the locations a staff member is allowed to work at.
     /**
      * Locations the staff member may work at: a manager can use every active
      * location, others only the ones granted.
@@ -74,6 +84,7 @@ public class StaffService {
         return new ArrayList<>(staff.getAccessibleLocations());
     }
 
+    // Generated with assistance from Claude: checks whether a staff member may work at a location.
     public boolean canUseLocation(Staff staff, Location location) {
         return location != null && getUsableLocations(staff).contains(location);
     }
@@ -131,6 +142,7 @@ public class StaffService {
         return dataStore.updateStaffPassword(staff.getStaffID(), newPassword);
     }
 
+    // Generated with assistance from Claude: checks a new password follows the password rules.
     private void checkPasswordRules(String password) {
         if (password == null || password.length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters.");
@@ -151,6 +163,7 @@ public class StaffService {
         dataStore.saveStaff();
     }
 
+    // Generated with assistance from Claude: removes a staff member's access to some locations.
     /**
      * Removes the chosen locations from the staff member and keeps the rest.
      * Throws with the reason if nothing can be removed.

@@ -32,6 +32,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Defleet screen: a warning, a plate box, the vehicle's details once it is
  * found, and a red "are you sure" panel before anything happens. It only

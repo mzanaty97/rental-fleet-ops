@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for Print Invoice. Finds the saved invoice with the
  * InvoiceService, gives the view the text to show, and writes the PDF when the

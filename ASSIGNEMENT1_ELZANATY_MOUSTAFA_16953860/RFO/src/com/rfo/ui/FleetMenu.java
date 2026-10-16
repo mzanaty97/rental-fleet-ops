@@ -10,6 +10,11 @@ import com.rfo.service.VehicleService;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console fleet menu: query available vehicles, query service-due vehicles and update
+ * a vehicle's status.
+ */
 public class FleetMenu extends Menu {
 
     private StaffService staffService;

@@ -30,6 +30,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A vehicle table screen. The same view serves three Fleet menu options: it
  * always shows one kind of vehicles (its Mode), can offer a category filter on

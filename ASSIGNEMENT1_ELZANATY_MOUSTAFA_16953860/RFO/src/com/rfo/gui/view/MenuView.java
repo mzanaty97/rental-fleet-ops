@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * One menu screen: a breadcrumb, a title and one numbered row per option, like
  * a console menu. An option can be chosen by clicking it, or by typing its

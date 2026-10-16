@@ -3,6 +3,10 @@ package com.rfo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A staff member with a role, the locations they can access and the one they are working
+ * at. Implements Person.
+ */
 public class Staff implements Person {
 
     private String staffID;

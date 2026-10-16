@@ -19,6 +19,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for Car Transfer and Workshop. They share this class because the
  * steps are the same: find the vehicle at the staff member's current location,

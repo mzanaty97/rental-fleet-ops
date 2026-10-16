@@ -7,6 +7,12 @@ import com.rfo.model.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude (modified existing class): I wrote this class in Part 1; Claude helped me move more of the business rules into it in Part 2 (see the method notes) so the GUI and the console menus share them.
+/**
+ * Business rules for locations: adding, closing and finding locations and counting the
+ * vehicles at one. Rule violations are reported with IllegalArgumentException so any
+ * screen can show the message.
+ */
 public class LocationService {
 
     private static final int GENERIC_DRIVER_ID = 0; // reserved placeholder driver for administrative fleet moves
@@ -18,14 +24,17 @@ public class LocationService {
         this.dataStore = dataStore;
     }
 
+    // Generated with assistance from Claude: lists every location.
     public List<Location> getAllLocations() {
         return new ArrayList<>(dataStore.getLocations());
     }
 
+    // Generated with assistance from Claude: lists the locations that are still open.
     public List<Location> getActiveLocations() {
         return dataStore.search(dataStore.getLocations(), Location::isActive);
     }
 
+    // Generated with assistance from Claude: finds a location by its ID.
     public Location findLocation(String locationID) {
         if (locationID == null) {
             return null;
@@ -34,6 +43,7 @@ public class LocationService {
         return dataStore.getBy(dataStore.getLocations(), l -> l.getLocationID().equals(id));
     }
 
+    // Generated with assistance from Claude: counts the vehicles currently at a location.
     public int countVehiclesAt(String locationID) {
         return dataStore.search(dataStore.getVehicles(),
                 v -> v.getCurrentLocation() != null
@@ -75,6 +85,7 @@ public class LocationService {
         return newLocation;
     }
 
+    // Generated with assistance from Claude: (modified existing method) now throws IllegalArgumentException with a message instead of returning false.
     /**
      * Closes a location, first moving any vehicles there to the destination.
      *
@@ -120,6 +131,7 @@ public class LocationService {
         dataStore.saveLocations();
     }
 
+    // Generated with assistance from Claude: checks that a text field was filled in.
     private boolean isBlank(String text) {
         return text == null || text.trim().isEmpty();
     }

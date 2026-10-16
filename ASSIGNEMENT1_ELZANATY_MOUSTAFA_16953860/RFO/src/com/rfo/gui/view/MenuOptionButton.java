@@ -12,6 +12,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JButton;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * One row of a menu: a number badge, the option name, a one-line description
  * and a chevron. It draws itself in five looks: rest, hover, "matched" (its

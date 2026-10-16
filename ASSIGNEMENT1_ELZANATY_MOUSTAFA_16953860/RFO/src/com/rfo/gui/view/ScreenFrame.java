@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Wraps a feature screen with a bar on top: a Back button, a thin divider, the
  * path to the screen in small text and its title in large text. Every feature

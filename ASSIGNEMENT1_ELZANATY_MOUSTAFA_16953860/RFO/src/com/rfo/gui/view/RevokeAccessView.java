@@ -29,6 +29,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Revoke Location Access: pick a staff member, tick the locations to remove (or
  * Select all), then confirm in the red panel underneath. Only the ticked

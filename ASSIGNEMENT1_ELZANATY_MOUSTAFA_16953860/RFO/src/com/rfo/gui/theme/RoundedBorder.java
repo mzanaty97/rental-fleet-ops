@@ -16,6 +16,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.AbstractBorder;
 import javax.swing.plaf.UIResource;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The outline around text fields and combo boxes: a thin rounded line that
  * becomes a 2 px blue ring while the field has the keyboard focus, or a 2 px

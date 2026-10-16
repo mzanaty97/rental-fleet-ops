@@ -7,6 +7,8 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.DefaultListCellRenderer;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A drop down of staff members shown as "ID · First Last". Setting the list
  * keeps the same person selected.

@@ -1,5 +1,8 @@
 package com.rfo.model;
 
+/**
+ * The insurance tiers. The rate is a multiplier applied to the base insurance price.
+ */
 public enum Insurance {
     BASIC(0.0),
     MEDIUM(0.8),

@@ -9,6 +9,10 @@ import com.rfo.service.LocationService;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for viewing, adding and closing locations.
+ */
 public class ManageLocationsMenu extends Menu {
 
     private LocationService service;

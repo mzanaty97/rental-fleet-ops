@@ -6,6 +6,8 @@ import com.rfo.model.Driver;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Business rules for creating a driver (a customer who rents a vehicle). The
  * checks return one message per field so the screen can show each problem next

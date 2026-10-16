@@ -4,6 +4,9 @@ import com.rfo.model.Staff;
 import com.rfo.service.AuthService;
 import java.util.Scanner;
 
+/**
+ * The console login. Asks for a staff ID and password and returns the staff member.
+ */
 public class LoginMenu {
 
     private static final int MAX_ATTEMPTS = 5;

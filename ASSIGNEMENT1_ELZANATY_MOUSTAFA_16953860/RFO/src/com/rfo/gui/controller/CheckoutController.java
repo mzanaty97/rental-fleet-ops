@@ -19,6 +19,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for Checkout. It checks each part of the form with the
  * MovementService, shows the reasons next to the field they belong to, and

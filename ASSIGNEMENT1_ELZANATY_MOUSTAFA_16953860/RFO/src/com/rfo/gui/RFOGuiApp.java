@@ -9,6 +9,8 @@ import com.rfo.service.StaffService;
 import javax.swing.SwingUtilities;
 import com.rfo.gui.theme.Theme;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Starts the Swing version of RFO: creates the model, views and controllers and
  * connects them.

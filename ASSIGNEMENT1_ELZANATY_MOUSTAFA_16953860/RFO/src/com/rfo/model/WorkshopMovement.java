@@ -3,6 +3,10 @@ package com.rfo.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * A workshop movement (WSM): sends a vehicle to the workshop for service or repair. A
+ * driven movement that marks the vehicle as WORKSHOP while it is out.
+ */
 public class WorkshopMovement extends DrivenMovement {
 
     // new movement

@@ -15,6 +15,8 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A row of driver ID pills. Click a pill to remove that driver.
  */

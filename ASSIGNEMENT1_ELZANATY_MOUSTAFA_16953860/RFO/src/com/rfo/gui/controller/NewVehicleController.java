@@ -9,6 +9,8 @@ import com.rfo.service.VehicleService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for New Vehicle. It checks each box with the VehicleService, shows
  * the reasons next to the box they belong to, and adds the vehicle only when

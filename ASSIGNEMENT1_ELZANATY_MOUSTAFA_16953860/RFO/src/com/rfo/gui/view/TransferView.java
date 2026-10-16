@@ -35,6 +35,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * The Car Transfer and Workshop screens. They are the same form: which vehicle,
  * who drives it, and when and where it is due back. The Kind says which words

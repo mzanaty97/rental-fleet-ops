@@ -8,6 +8,8 @@ import com.rfo.service.MovementService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for Close Rental. Step 1 looks the rental up and checks the
  * odometer with the MovementService; step 2 shows the final cost and closes the

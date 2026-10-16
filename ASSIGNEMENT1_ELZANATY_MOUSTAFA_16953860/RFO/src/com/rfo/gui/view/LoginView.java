@@ -24,6 +24,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Login form shown in a new session tab: a white card with the Staff ID and
  * password, the Log in button, a five-step meter of wrong attempts and a slim
