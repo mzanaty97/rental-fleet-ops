@@ -98,8 +98,9 @@ public final class Theme {
         switch (key) {
             case "AVAILABLE":
                 return new Badge(0x1B6B3F, 0xE3F4EA, 0x2E9E5B);
-            case "IN_USE":
             case "OPEN":
+                return new Badge(0x1B6B3F, 0xE3F4EA, 0x2E9E5B);   // light green, like AVAILABLE
+            case "IN_USE":
                 return new Badge(0x17578C, 0xE3EEFA, 0x1F6FB2);
             case "WORKSHOP":
             case "INCOMPLETE":

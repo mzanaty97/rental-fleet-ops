@@ -6,8 +6,10 @@ import com.rfo.model.Driver;
 import com.rfo.model.Staff;
 import com.rfo.model.Insurance;
 import com.rfo.model.Location;
+import com.rfo.model.DefleetMovement;
 import com.rfo.model.Movement;
 import com.rfo.model.MovementStatus;
+import com.rfo.model.NewCarMovement;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Vehicle;
 import com.rfo.model.VehicleStatus;
@@ -581,5 +583,115 @@ public class MovementService {
         }
         rentals.sort(Comparator.comparingInt(m -> Integer.parseInt(m.getMovementID())));
         return rentals;
+    }
+
+    // ---- Vehicle movement history (Show Vehicle Movements) ----
+    /**
+     * One line of a vehicle's history. The check-in values of a movement that
+     * has not been checked in yet are the expected ones (expected is true) and
+     * the odometer in is empty (null) until it is closed.
+     */
+    public static class HistoryRow {
+
+        public final String type;
+        public final String movementID;
+        public final String outLocation;
+        public final LocalDateTime outTime;
+        public final Integer odoOut;
+        public final String inLocation;
+        public final LocalDateTime inTime;
+        public final Integer odoIn;
+        public final boolean expected;
+        public final MovementStatus status;
+
+        HistoryRow(String type, String movementID, String outLocation, LocalDateTime outTime, Integer odoOut,
+                String inLocation, LocalDateTime inTime, Integer odoIn, boolean expected, MovementStatus status) {
+            this.type = type;
+            this.movementID = movementID;
+            this.outLocation = outLocation;
+            this.outTime = outTime;
+            this.odoOut = odoOut;
+            this.inLocation = inLocation;
+            this.inTime = inTime;
+            this.odoIn = odoIn;
+            this.expected = expected;
+            this.status = status;
+        }
+    }
+
+    /**
+     * The short code for a movement: ORA rental, CTM car transfer, WSM
+     * workshop, NVM new vehicle, DVM defleet.
+     */
+    public String typeCode(Movement movement) {
+        if (movement instanceof RentalMovement) {
+            return "ORA";
+        }
+        if (movement instanceof CarTransferMovement) {
+            return "CTM";
+        }
+        if (movement instanceof WorkshopMovement) {
+            return "WSM";
+        }
+        if (movement instanceof NewCarMovement) {
+            return "NVM";
+        }
+        if (movement instanceof DefleetMovement) {
+            return "DVM";
+        }
+        return "???";
+    }
+
+    /**
+     * Every movement of the vehicle with this plate, newest first (so the NVM
+     * that brought it into the fleet is last). Throws with the reason if the
+     * plate is empty or no vehicle has it.
+     */
+    public List<HistoryRow> vehicleHistory(String plateText) {
+        String plate = plateText == null ? "" : plateText.trim().toUpperCase();
+        if (plate.isEmpty()) {
+            throw new IllegalArgumentException("Enter a rego.");
+        }
+        if (dataStore.getBy(dataStore.getVehicles(), v -> v.getPlateNumber().equals(plate)) == null) {
+            throw new IllegalArgumentException("No vehicle with this rego.");
+        }
+        List<Movement> mine = dataStore.search(dataStore.getMovements(),
+                m -> m.getVehicle().getPlateNumber().equals(plate));
+        // movement IDs are handed out in order, so the biggest ID is the newest movement
+        mine.sort(Comparator.comparingInt((Movement m) -> idNumber(m.getMovementID())).reversed());
+
+        List<HistoryRow> rows = new java.util.ArrayList<>();
+        for (Movement m : mine) {
+            boolean closed = m.getStatus() == MovementStatus.CLOSED;
+            boolean checkedIn = m.getCheckInDT() != null;
+            boolean expected = !checkedIn && m instanceof DrivenMovement;
+            String inLoc = null;
+            LocalDateTime inTime = null;
+            if (checkedIn) {
+                inLoc = m.getCheckInLoc() == null ? null : m.getCheckInLoc().getName();
+                inTime = m.getCheckInDT();
+            } else if (expected) {
+                DrivenMovement dm = (DrivenMovement) m;
+                inLoc = dm.getExpectedCILoc() == null ? null : dm.getExpectedCILoc().getName();
+                inTime = dm.getExpectedCIDT();
+            }
+            // a new vehicle or a defleet happens in one go, so the car has not travelled
+            Integer odoIn = null;
+            if (closed) {
+                odoIn = (m instanceof NewCarMovement || m instanceof DefleetMovement) ? m.getOdoOut() : m.getOdoIn();
+            }
+            rows.add(new HistoryRow(typeCode(m), m.getMovementID(),
+                    m.getCheckOutLoc() == null ? null : m.getCheckOutLoc().getName(), m.getCheckOutDT(),
+                    m.getOdoOut(), inLoc, inTime, odoIn, expected, m.getStatus()));
+        }
+        return rows;
+    }
+
+    private int idNumber(String movementID) {
+        try {
+            return Integer.parseInt(movementID);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

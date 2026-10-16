@@ -224,6 +224,7 @@ public class StaffService {
         if (role == StaffRole.MANAGER || role == StaffRole.AGENT) {
             options.add("Query Drivers");
         }
+        options.add("Show Vehicle Movements");
         return options;
     }
 

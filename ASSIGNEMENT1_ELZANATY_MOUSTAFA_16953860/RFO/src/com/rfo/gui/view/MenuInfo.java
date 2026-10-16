@@ -39,6 +39,7 @@ public final class MenuInfo {
         put("Defleet", "Remove a vehicle from the fleet");
         put("Query Movement Details", "Look up a movement by its ID");
         put("Query Drivers", "Look up a driver by their ID");
+        put("Show Vehicle Movements", "Every movement of a vehicle, newest first");
         // fleet
         put("Query Available Vehicles", "Vehicles ready to rent, filter by category");
         put("Query Service Due Vehicles", "Vehicles over their service distance");

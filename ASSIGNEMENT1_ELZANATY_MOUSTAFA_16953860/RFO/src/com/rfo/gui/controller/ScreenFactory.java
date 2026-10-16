@@ -18,6 +18,7 @@ import com.rfo.gui.view.NewVehicleView;
 import com.rfo.gui.view.ReportView;
 import com.rfo.gui.view.MovementDetailsView;
 import com.rfo.gui.view.DriverView;
+import com.rfo.gui.view.VehicleMovementsView;
 import com.rfo.gui.view.PlaceholderView;
 import com.rfo.gui.view.RevokeAccessView;
 import com.rfo.gui.view.SessionView;
@@ -114,6 +115,10 @@ public class ScreenFactory {
                 DriverView drivers = new DriverView();
                 new DriverController(drivers, movementService, sessionView.getConsole());
                 return drivers;
+            case "Show Vehicle Movements":
+                VehicleMovementsView history = new VehicleMovementsView();
+                new VehicleMovementsController(history, movementService, sessionView.getConsole());
+                return history;
             case "Out on Rental Report":
                 ReportView outOnRental = new ReportView(new String[]{"Rego", "Expected Return", "Category"},
                         new int[]{}, null);

@@ -8,6 +8,7 @@ import com.rfo.model.Staff;
 import com.rfo.service.DataStore;
 import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -40,6 +41,9 @@ public class MovementDetailsMenu extends Menu {
                 break;
             case "Query Drivers":
                 queryDrivers();
+                break;
+            case "Show Vehicle Movements":
+                showVehicleMovements();
                 break;
             default:
                 System.out.println(select + " not implemented yet.");
@@ -84,6 +88,37 @@ public class MovementDetailsMenu extends Menu {
             System.out.println("RSA: " + rm.hasRSA());
             System.out.println("Equipment: " + rm.getEquipment());
             System.out.println("Price: $" + String.format("%.2f", rm.getPrice()));
+        }
+    }
+
+    private void showVehicleMovements() {
+        System.out.print("Rego: ");
+        String rego = scanner.nextLine();
+
+        List<MovementService.HistoryRow> rows;
+        try {
+            rows = movementService.vehicleHistory(rego);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        DateTimeFormatter when = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String line = "%-5s %-10s %-22s %-17s %9s  %-22s %-17s %9s%n";
+        System.out.println("\n--- Vehicle Movements (newest first) ---");
+        System.out.printf(line, "Type", "Movement", "Check-out location", "Check-out time", "Odo out",
+                "Check-in location", "Check-in time", "Odo in");
+        boolean anyExpected = false;
+        for (MovementService.HistoryRow r : rows) {
+            String mark = r.expected ? "*" : "";
+            anyExpected |= r.expected;
+            System.out.printf(line, r.type, r.movementID, r.outLocation == null ? "" : r.outLocation,
+                    r.outTime == null ? "" : r.outTime.format(when), r.odoOut == null ? "" : r.odoOut,
+                    (r.inLocation == null ? "" : r.inLocation) + mark,
+                    r.inTime == null ? "" : r.inTime.format(when) + mark, r.odoIn == null ? "" : r.odoIn);
+        }
+        if (anyExpected) {
+            System.out.println("* expected check-in, the vehicle has not been checked in yet");
         }
     }
 

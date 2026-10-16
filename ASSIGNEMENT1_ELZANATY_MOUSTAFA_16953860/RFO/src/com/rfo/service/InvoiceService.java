@@ -79,6 +79,14 @@ public class InvoiceService {
      * if it does not exist yet.
      */
     public Invoice issueFor(RentalMovement rental) {
+        return issueFor(rental, LocalDateTime.now());
+    }
+
+    /**
+     * The same, but the invoice carries the given issue time (used when old
+     * rentals are loaded as sample data).
+     */
+    public Invoice issueFor(RentalMovement rental, LocalDateTime issuedAt) {
         Invoice existing = dataStore.getBy(dataStore.getInvoices(), i -> i.getMovementID().equals(rental.getMovementID()));
         if (existing != null) {
             return existing;
@@ -89,7 +97,7 @@ public class InvoiceService {
         for (Invoice i : dataStore.getInvoices()) {
             nextID = Math.max(nextID, i.getInvoiceID() + 1);
         }
-        Invoice invoice = new Invoice(nextID, rental.getMovementID(), LocalDateTime.now(),
+        Invoice invoice = new Invoice(nextID, rental.getMovementID(), issuedAt,
                 rental.getVehicle().getPlateNumber(),
                 rental.getVehicle().getMake() + " " + rental.getVehicle().getModel() + " " + rental.getVehicle().getYear(),
                 driverNames(rental), place(rental.getCheckOutDT(), rental.getCheckOutLoc() == null ? null : rental.getCheckOutLoc().getName()),
