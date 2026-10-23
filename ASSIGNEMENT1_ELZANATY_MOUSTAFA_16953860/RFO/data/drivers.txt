@@ -1,4 +1,19 @@
 0|Fleet|Operations|GENERIC000|fleetops@rfo.local|0000000000|N/A|N/A|NZ|0000
 1|John|Smith|DL123456|john.smith@example.com|0211234567|10 Beach Road|Auckland|NZ|1010
 2|Emma|Wilson|DL654321|emma.wilson@example.com|0219876543|5 Hill Street|Wellington|NZ|6011
+3|Moustafa|ElZanaty|123445|test@test.com|0225121205|123 test street|auckland|NZ|1011
+4|Aroha|Tane|NZ482910|aroha.tane@example.com|021 555 0101|12 Karaka Street|Auckland|NZ|1010
+5|Liam|Walker|NZ193847|liam.walker@example.com|021 555 0102|8 Ocean View Road|Wellington|NZ|6011
+6|Sophie|Chen|NZ556201|sophie.chen@example.com|022 555 0103|45 Queen Street|Auckland|NZ|1010
+7|Hemi|Ngata|NZ730145|hemi.ngata@example.com|027 555 0104|3 Rata Place|Hamilton|NZ|3200
+8|Olivia|Brown|NZ209384|olivia.brown@example.com|021 555 0105|19 Cuba Street|Wellington|NZ|6011
+9|Noah|Patel|NZ874520|noah.patel@example.com|022 555 0106|71 Dominion Road|Auckland|NZ|1024
+10|Mia|Kereama|NZ361908|mia.kereama@example.com|027 555 0107|6 Totara Lane|Tauranga|NZ|3110
+11|Jack|Thompson|NZ645172|jack.thompson@example.com|021 555 0108|88 Victoria Avenue|Whanganui|NZ|4500
+12|Isla|Murray|NZ918263|isla.murray@example.com|022 555 0109|22 Lambton Quay|Wellington|NZ|6011
+13|Ethan|Singh|NZ027485|ethan.singh@example.com|027 555 0110|14 Great North Road|Auckland|NZ|1021
+14|Charlotte|Davies|NZ583619|charlotte.davies@example.com|021 555 0111|5 Marine Parade|Napier|NZ|4110
+15|Tane|Rewi|NZ412096|tane.rewi@example.com|022 555 0112|31 Fenton Street|Rotorua|NZ|3010
+16|Grace|O'Neill|NZ790351|grace.oneill@example.com|027 555 0113|9 Princes Street|Dunedin|NZ|9016
+17|Lucas|Fraser|NZ256473|lucas.fraser@example.com|021 555 0114|40 Papanui Road|Christchurch|NZ|8014
 87654319|Seed|Placeholder|SEED000|seed@rfo.local|0000000000|N/A|N/A|NZ|0000
