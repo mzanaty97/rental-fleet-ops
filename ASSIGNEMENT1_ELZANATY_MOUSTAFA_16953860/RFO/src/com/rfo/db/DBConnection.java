@@ -6,6 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+// Generated with assistance from Claude. I designed the structure and logic
+// (following my Part 1 design); Claude wrote the repeated methods and boilerplate.
+/**
+ * Singleton that owns the one embedded Derby connection for the whole app. It creates the
+ * database and any missing tables the first time it is used, so no set-up is needed.
+ */
 public class DBConnection {
 
     private static final String DB_URL = "jdbc:derby:db/rfodb;create=true";
@@ -141,6 +147,32 @@ public class DBConnection {
                     EQUIPMENT_TYPE VARCHAR(30) NOT NULL,
                     QUANTITY INT NOT NULL,
                     PRIMARY KEY (MOVEMENT_ID, EQUIPMENT_TYPE),
+                    FOREIGN KEY (MOVEMENT_ID) REFERENCES MOVEMENTS(MOVEMENT_ID)
+                )
+                """);
+
+            // one saved invoice per closed rental; the values are a snapshot of what was charged
+            createTableIfMissing(st, "INVOICES", """
+                CREATE TABLE INVOICES (
+                    INVOICE_ID INT PRIMARY KEY,
+                    MOVEMENT_ID VARCHAR(20) NOT NULL UNIQUE,
+                    ISSUED_AT TIMESTAMP NOT NULL,
+                    PLATE VARCHAR(20),
+                    VEHICLE VARCHAR(120),
+                    DRIVERS VARCHAR(400),
+                    CHECKOUT_TEXT VARCHAR(160),
+                    CHECKIN_TEXT VARCHAR(160),
+                    ODO_OUT INT,
+                    ODO_IN INT,
+                    DAYS INT,
+                    BASE DOUBLE,
+                    EQUIPMENT DOUBLE,
+                    INSURANCE_TIER VARCHAR(20),
+                    INSURANCE DOUBLE,
+                    RSA DOUBLE,
+                    TOTAL DOUBLE,
+                    CO_STAFF VARCHAR(100),
+                    CI_STAFF VARCHAR(100),
                     FOREIGN KEY (MOVEMENT_ID) REFERENCES MOVEMENTS(MOVEMENT_ID)
                 )
                 """);

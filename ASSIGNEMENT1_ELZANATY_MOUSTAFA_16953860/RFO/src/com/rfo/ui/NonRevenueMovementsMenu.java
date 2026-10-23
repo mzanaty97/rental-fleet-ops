@@ -14,6 +14,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for non-revenue movements: new vehicle, car transfer, workshop and
+ * defleet.
+ */
 public class NonRevenueMovementsMenu extends Menu {
 
     private VehicleService vehicleService;
@@ -90,15 +95,13 @@ public class NonRevenueMovementsMenu extends Menu {
         System.out.print("Has GPS? (yes/no): ");
         boolean hasGPS = scanner.nextLine().trim().equalsIgnoreCase("yes");
 
-        Vehicle vehicle = vehicleService.addVehicle(plateNumber, make, model, year,
-                category, fuelType, hasGPS, staff.getStaffID());
-
-        if (vehicle == null) {
-            System.out.println("Failed to add vehicle. See message above.");
-            return;
+        try {
+            Vehicle vehicle = vehicleService.addVehicle(plateNumber, make, model, year,
+                    category, fuelType, hasGPS, staff.getStaffID());
+            System.out.println("Vehicle added successfully: " + vehicle.getPlateNumber());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("Vehicle added successfully: " + vehicle.getPlateNumber());
     }
 
     private void carTransfer() {
@@ -123,15 +126,13 @@ public class NonRevenueMovementsMenu extends Menu {
         System.out.print("Expected arrival location ID: ");
         String expectedCILocID = scanner.nextLine();
 
-        CarTransferMovement ctm = movementService.startCTM(plateNumber, staff.getStaffID(), checkOutLocID,
-                driverIDs, expectedCIDT, expectedCILocID);
-
-        if (ctm == null) {
-            System.out.println("Failed to start transfer. See message above.");
-            return;
+        try {
+            CarTransferMovement ctm = movementService.startCTM(plateNumber, staff.getStaffID(), checkOutLocID,
+                    driverIDs, expectedCIDT, expectedCILocID);
+            System.out.println("Transfer started. Movement ID: " + ctm.getMovementID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("Transfer started. Movement ID: " + ctm.getMovementID());
     }
 
     private void workshop() {
@@ -156,28 +157,24 @@ public class NonRevenueMovementsMenu extends Menu {
         System.out.print("Expected return location ID: ");
         String expectedCILocID = scanner.nextLine();
 
-        WorkshopMovement wsm = movementService.startWSM(plateNumber, staff.getStaffID(), checkOutLocID,
-                driverIDs, expectedCIDT, expectedCILocID);
-
-        if (wsm == null) {
-            System.out.println("Failed to start workshop movement. See message above.");
-            return;
+        try {
+            WorkshopMovement wsm = movementService.startWSM(plateNumber, staff.getStaffID(), checkOutLocID,
+                    driverIDs, expectedCIDT, expectedCILocID);
+            System.out.println("Workshop movement started. Movement ID: " + wsm.getMovementID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("Workshop movement started. Movement ID: " + wsm.getMovementID());
     }
 
     private void defleet() {
         System.out.print("Plate number: ");
         String plateNumber = scanner.nextLine();
 
-        boolean success = vehicleService.defleetVehicle(plateNumber, staff.getStaffID());
-
-        if (!success) {
-            System.out.println("Failed to defleet vehicle. See message above.");
-            return;
+        try {
+            vehicleService.defleetVehicle(plateNumber, staff.getStaffID());
+            System.out.println("Vehicle defleeted successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("Vehicle defleeted successfully.");
     }
 }

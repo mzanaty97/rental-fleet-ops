@@ -1,5 +1,8 @@
 package com.rfo.model;
 
+/**
+ * The states a vehicle can be in.
+ */
 public enum VehicleStatus {
     IN_USE,
     AVAILABLE,

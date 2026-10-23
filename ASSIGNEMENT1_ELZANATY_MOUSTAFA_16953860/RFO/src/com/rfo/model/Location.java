@@ -3,6 +3,9 @@ package com.rfo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A rental station with an ID, a name, an address and an active flag.
+ */
 public class Location {
 
     private String locationID;

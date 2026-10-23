@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Part 1 text-file storage for movements (data/movements.txt). In Part 2 it is only used
+ * to fill an empty database the first time the app runs; MovementDAO does the saving now.
+ */
 public class MovementFileHandler {
 
     private static final String FILE_PATH = "data/movements.txt";

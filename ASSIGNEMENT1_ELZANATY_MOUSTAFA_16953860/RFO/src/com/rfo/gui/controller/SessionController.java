@@ -4,6 +4,8 @@ import com.rfo.gui.view.SessionView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Handles actions inside a logged-in session tab. Sections add their own
  * controllers later.

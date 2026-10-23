@@ -3,6 +3,11 @@ package com.rfo.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Base class for movements where a driver takes the vehicle out (rental, transfer,
+ * workshop). Adds the driver IDs and the expected check-in time and location to a
+ * Movement.
+ */
 public abstract class DrivenMovement extends Movement {
 
     protected List<Integer> driverIDs;
@@ -47,6 +52,16 @@ public abstract class DrivenMovement extends Movement {
 
     public Location getExpectedCILoc() {
         return expectedCILoc;
+    }
+
+    // Generated with assistance from Claude: lets an open rental change where and when the vehicle is expected back.
+    /**
+     * Changes where and when the vehicle is expected back. Used when an open
+     * rental is amended.
+     */
+    public void amendExpectedReturn(LocalDateTime expectedCIDT, Location expectedCILoc) {
+        this.expectedCIDT = expectedCIDT;
+        this.expectedCILoc = expectedCILoc;
     }
 
     @Override

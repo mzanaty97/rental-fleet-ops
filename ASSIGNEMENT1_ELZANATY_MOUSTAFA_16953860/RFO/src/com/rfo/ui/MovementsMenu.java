@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The console movements menu. Opens the revenue, non-revenue and movement details menus.
+ */
 public class MovementsMenu extends Menu {
 
     private StaffService service;

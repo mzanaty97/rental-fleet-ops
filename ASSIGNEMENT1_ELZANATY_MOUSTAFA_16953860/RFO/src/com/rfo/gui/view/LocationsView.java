@@ -12,6 +12,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * A table of locations. It serves two menu options: View Locations (every
  * location) and, with a vehicle count column, the table used on the Close
@@ -46,7 +48,6 @@ public class LocationsView extends JPanel {
         topBar.add(countLabel);
         bottomBar.setBackground(Color.WHITE);
 
-        table.setRowHeight(26);
         table.setAutoCreateRowSorter(true);
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);

@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Generated with assistance from Claude. I designed the structure and logic
+// (following my Part 1 design); Claude wrote the repeated methods and boilerplate.
 /**
  * One-time migration of the Part 1 data/*.txt files into the Derby database.
  *

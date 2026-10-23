@@ -8,6 +8,8 @@ import com.rfo.service.LocationService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for the Add Location form. It builds the address from the form,
  * asks the service to add the location and prints the result in the console.

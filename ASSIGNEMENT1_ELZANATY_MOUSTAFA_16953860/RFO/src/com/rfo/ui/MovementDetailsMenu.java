@@ -6,17 +6,25 @@ import com.rfo.model.Movement;
 import com.rfo.model.RentalMovement;
 import com.rfo.model.Staff;
 import com.rfo.service.DataStore;
+import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for looking up movement details, drivers and a vehicle's movements.
+ */
 public class MovementDetailsMenu extends Menu {
 
     private StaffService staffService;
+    private MovementService movementService;
 
     public MovementDetailsMenu(Scanner scanner, Staff staff, DataStore dataStore) {
         super(scanner, "Previous Menu", staff, dataStore);
         this.staffService = new StaffService(dataStore);
+        this.movementService = new MovementService(dataStore);
     }
 
     @Override
@@ -38,6 +46,9 @@ public class MovementDetailsMenu extends Menu {
             case "Query Drivers":
                 queryDrivers();
                 break;
+            case "Show Vehicle Movements":
+                showVehicleMovements();
+                break;
             default:
                 System.out.println(select + " not implemented yet.");
                 break;
@@ -48,11 +59,11 @@ public class MovementDetailsMenu extends Menu {
         System.out.print("Movement ID: ");
         String movementID = scanner.nextLine();
 
-        Movement movement = dataStore.getBy(dataStore.getMovements(),
-                m -> m.getMovementID().equals(movementID));
-
-        if (movement == null) {
-            System.out.println("Movement not found.");
+        Movement movement;
+        try {
+            movement = movementService.findMovement(movementID);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 
@@ -84,22 +95,47 @@ public class MovementDetailsMenu extends Menu {
         }
     }
 
+    // Generated with assistance from Claude: console version of Show Vehicle Movements.
+    private void showVehicleMovements() {
+        System.out.print("Rego: ");
+        String rego = scanner.nextLine();
+
+        List<MovementService.HistoryRow> rows;
+        try {
+            rows = movementService.vehicleHistory(rego);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        DateTimeFormatter when = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String line = "%-5s %-10s %-22s %-17s %9s  %-22s %-17s %9s%n";
+        System.out.println("\n--- Vehicle Movements (newest first) ---");
+        System.out.printf(line, "Type", "Movement", "Check-out location", "Check-out time", "Odo out",
+                "Check-in location", "Check-in time", "Odo in");
+        boolean anyExpected = false;
+        for (MovementService.HistoryRow r : rows) {
+            String mark = r.expected ? "*" : "";
+            anyExpected |= r.expected;
+            System.out.printf(line, r.type, r.movementID, r.outLocation == null ? "" : r.outLocation,
+                    r.outTime == null ? "" : r.outTime.format(when), r.odoOut == null ? "" : r.odoOut,
+                    (r.inLocation == null ? "" : r.inLocation) + mark,
+                    r.inTime == null ? "" : r.inTime.format(when) + mark, r.odoIn == null ? "" : r.odoIn);
+        }
+        if (anyExpected) {
+            System.out.println("* expected check-in, the vehicle has not been checked in yet");
+        }
+    }
+
     private void queryDrivers() {
         System.out.print("Driver ID: ");
         String input = scanner.nextLine();
 
-        int driverID;
+        Driver driver;
         try {
-            driverID = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number.");
-            return;
-        }
-
-        Driver driver = dataStore.getBy(dataStore.getDrivers(), d -> d.getDriverID() == driverID);
-
-        if (driver == null) {
-            System.out.println("Driver not found.");
+            driver = movementService.findDriver(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return;
         }
 

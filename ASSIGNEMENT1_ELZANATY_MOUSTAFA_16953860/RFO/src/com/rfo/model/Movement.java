@@ -2,6 +2,11 @@ package com.rfo.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Abstract base class for every vehicle movement. Holds the vehicle, the staff, the
+ * check-out and check-in times and locations, the odometer readings and the movement
+ * status. Subclasses define what execute() does to the vehicle.
+ */
 public abstract class Movement {
 
     private static int LATEST_MOVEMENT_ID;

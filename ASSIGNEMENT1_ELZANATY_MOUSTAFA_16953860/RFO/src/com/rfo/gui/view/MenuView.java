@@ -1,98 +1,145 @@
 package com.rfo.gui.view;
 
-import java.awt.Color;
+import com.rfo.gui.theme.Theme;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
- * One menu screen: a title and one numbered button per option, like a console
- * menu. An option can be chosen by clicking it, or by typing its number and
- * pressing Enter. Backspace deletes a typed digit, or goes back when nothing is
- * typed. Each option button carries its label as its action command, and an
- * optional Back button (numbered last, like the console's exit option) returns
- * to the menu above.
+ * One menu screen: a breadcrumb, a title and one numbered row per option, like
+ * a console menu. An option can be chosen by clicking it, or by typing its
+ * number and pressing Enter; the number box under the list shows what has been
+ * typed, and the matching row lights up. Backspace deletes a typed digit, or
+ * goes back when nothing is typed. Escape clears the number. Each row carries
+ * its label as its action command, and an optional Back row (numbered last,
+ * like the console's exit option) returns to the menu above.
  */
 public class MenuView extends JPanel {
 
     public static final String BACK = "Back";
 
     private static final int MAX_DIGITS = 2;
+    private static final int REJECT_MS = 2000;
 
-    private final List<JButton> optionButtons = new ArrayList<>();
-    private final List<JButton> allButtons = new ArrayList<>();
-    private final JButton backButton;
-    private final JLabel choiceBox = new JLabel("", SwingConstants.CENTER);
+    private final List<MenuOptionButton> optionButtons = new ArrayList<>();
+    private final List<MenuOptionButton> allButtons = new ArrayList<>();
+    private final MenuOptionButton backButton;
+    private final List<String> labels;
+    private final NumberEntryBox numberBox = new NumberEntryBox();
+    private final JLabel hintMain = new JLabel();
+    private final JLabel hintSub = new JLabel();
     private final StringBuilder typed = new StringBuilder();
+    private final boolean withBack;
+    private final Timer rejectTimer = new Timer(REJECT_MS, e -> clearTyped());
+    private boolean rejected = false;
     private MessageSink console;
 
-    public MenuView(String title, List<String> options, boolean withBack) {
-        super(new GridBagLayout());
-        setBackground(Color.WHITE);
+    /**
+     * @param title the big heading
+     * @param breadcrumb the small path above it, for example "Main menu ›
+     * Fleet"
+     */
+    public MenuView(String title, String breadcrumb, List<String> options, boolean withBack) {
+        super(new BorderLayout());
+        this.labels = options;
+        this.withBack = withBack;
+        setBackground(Theme.BG_WINDOW);
         setFocusable(true);
+        rejectTimer.setRepeats(false);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        int rows = options.size() + (withBack ? 1 : 0);
+        int rowHeight = rows <= 5 ? Theme.OPTION_H : Theme.OPTION_H_COMPACT;
 
-        JLabel heading = new JLabel(title, SwingConstants.CENTER);
-        heading.setFont(heading.getFont().deriveFont(Font.BOLD, 22f));
-        heading.setForeground(HomeView.NAVY);
-        gbc.insets = new Insets(0, 0, 20, 0);
-        add(heading, gbc);
+        JPanel page = new JPanel();
+        page.setOpaque(false);
+        page.setLayout(new BoxLayout(page, BoxLayout.Y_AXIS));
+        page.setBorder(BorderFactory.createEmptyBorder(28, 32, 16, 32));
 
-        gbc.insets = new Insets(6, 0, 6, 0);
+        JLabel crumb = new JLabel(breadcrumb);
+        crumb.setFont(Theme.F_SMALL);
+        crumb.setForeground(Theme.TEXT_SECONDARY);
+        JLabel heading = new JLabel(title);
+        heading.setFont(Theme.F_TITLE);
+        heading.setForeground(Theme.TEXT_PRIMARY);
+        left(crumb);
+        left(heading);
+        page.add(crumb);
+        page.add(Box.createVerticalStrut(2));
+        page.add(heading);
+        page.add(Box.createVerticalStrut(20));
+
         for (int i = 0; i < options.size(); i++) {
-            gbc.gridy++;
-            JButton button = createButton((i + 1) + ". " + options.get(i), options.get(i));
+            String label = options.get(i);
+            MenuOptionButton.Kind kind = MenuInfo.isComingSoon(label) ? MenuOptionButton.Kind.SOON : MenuOptionButton.Kind.NORMAL;
+            MenuOptionButton button = new MenuOptionButton(i + 1, label, MenuInfo.describe(label), kind, rowHeight);
+            button.setActionCommand(label);
             optionButtons.add(button);
-            add(button, gbc);
+            allButtons.add(button);
+            page.add(left(button));
+            page.add(Box.createVerticalStrut(8));
         }
 
         if (withBack) {
-            gbc.gridy++;
-            gbc.insets = new Insets(20, 0, 0, 0);
-            backButton = createButton((options.size() + 1) + ". Back", BACK);
-            add(backButton, gbc);
+            JPanel divider = new JPanel();
+            divider.setBackground(Theme.BORDER_DIVIDER);
+            divider.setPreferredSize(new Dimension(Theme.FORM_MAX_W, 1));
+            divider.setMaximumSize(new Dimension(Theme.FORM_MAX_W, 1));
+            page.add(left(divider));
+            page.add(Box.createVerticalStrut(6));
+            backButton = new MenuOptionButton(options.size() + 1, BACK, "", MenuOptionButton.Kind.BACK, rows <= 5 ? 48 : 44);
+            backButton.setActionCommand(BACK);
+            allButtons.add(backButton);
+            page.add(left(backButton));
         } else {
             backButton = null;
         }
 
-        // small darker box that shows the number typed so far
-        choiceBox.setOpaque(true);
-        choiceBox.setBackground(new Color(0xD5D9E2));
-        choiceBox.setForeground(HomeView.NAVY);
-        choiceBox.setFont(choiceBox.getFont().deriveFont(Font.BOLD, 16f));
-        choiceBox.setBorder(BorderFactory.createLineBorder(new Color(0xA9AFBE)));
-        choiceBox.setPreferredSize(new Dimension(64, 32));
-        gbc.gridy++;
-        gbc.insets = new Insets(18, 0, 0, 0);
-        add(choiceBox, gbc);
+        // number box with its hint to the right
+        hintMain.setFont(Theme.F_SMALL.deriveFont(13f));
+        hintSub.setFont(Theme.F_SMALL);
+        hintSub.setForeground(Theme.TEXT_SECONDARY);
+        JPanel hints = new JPanel();
+        hints.setOpaque(false);
+        hints.setLayout(new BoxLayout(hints, BoxLayout.Y_AXIS));
+        hints.add(hintMain);
+        hints.add(Box.createVerticalStrut(2));
+        hints.add(hintSub);
 
+        JPanel entry = new JPanel();
+        entry.setOpaque(false);
+        entry.setLayout(new BoxLayout(entry, BoxLayout.X_AXIS));
+        entry.add(numberBox);
+        entry.add(Box.createHorizontalStrut(12));
+        entry.add(hints);
+        page.add(Box.createVerticalStrut(rows <= 5 ? 20 : 12));
+        page.add(left(entry));
+
+        add(page, BorderLayout.NORTH);
         installKeys();
+        update();
     }
 
-    private JButton createButton(String text, String command) {
-        JButton button = new JButton(text);
-        button.setActionCommand(command);
-        button.setPreferredSize(new Dimension(280, 42));
-        allButtons.add(button);
-        return button;
+    private static <T extends JComponent> T left(T c) {
+        c.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return c;
     }
 
     /**
@@ -125,48 +172,115 @@ public class MenuView extends JPanel {
     }
 
     private void typeDigit(char digit) {
+        if (rejected) {
+            clearTyped();                    // typing again after a rejected number starts fresh
+        }
         if (typed.length() < MAX_DIGITS) {
             typed.append(digit);
-            updateChoiceBox();
+            update();
         }
     }
 
     private void backspace() {
         if (typed.length() > 0) {
-            typed.deleteCharAt(typed.length() - 1);
-            updateChoiceBox();
+            if (rejected) {
+                clearTyped();
+            } else {
+                typed.deleteCharAt(typed.length() - 1);
+                update();
+            }
         } else if (backButton != null) {
             backButton.doClick();
         }
     }
 
     private void clearTyped() {
+        rejectTimer.stop();
+        rejected = false;
         typed.setLength(0);
-        updateChoiceBox();
+        update();
     }
 
     private void choose() {
         if (typed.length() == 0) {
+            // nothing typed: Enter presses the row that has the keyboard focus (after Tab)
+            Component owner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+            if (owner instanceof MenuOptionButton && allButtons.contains(owner)) {
+                ((MenuOptionButton) owner).doClick();
+            }
             return;
         }
-        int number = Integer.parseInt(typed.toString());
-        clearTyped();
-
-        if (number >= 1 && number <= optionButtons.size()) {
-            optionButtons.get(number - 1).doClick();
-        } else if (backButton != null && number == optionButtons.size() + 1) {
-            backButton.doClick();
-        } else if (console != null) {
-            console.print("Please enter a valid option.");
+        if (rejected) {
+            return;
+        }
+        MenuOptionButton target = buttonFor(Integer.parseInt(typed.toString()));
+        if (target != null) {
+            clearTyped();
+            target.doClick();
+        } else {
+            if (console != null) {
+                console.print("Please enter a valid option.");
+            }
+            rejected = true;
+            rejectTimer.restart();
+            update();
         }
     }
 
-    private void updateChoiceBox() {
-        choiceBox.setText(typed.toString());
+    /**
+     * The row with this number, or null if there is none.
+     */
+    private MenuOptionButton buttonFor(int number) {
+        if (number >= 1 && number <= optionButtons.size()) {
+            return optionButtons.get(number - 1);
+        }
+        if (backButton != null && number == optionButtons.size() + 1) {
+            return backButton;
+        }
+        return null;
+    }
+
+    /**
+     * Refreshes the number box, the highlighted row and the hint next to the
+     * box.
+     */
+    private void update() {
+        boolean idle = typed.length() == 0;
+        MenuOptionButton match = idle ? null : buttonFor(Integer.parseInt(typed.toString()));
+        for (MenuOptionButton b : allButtons) {
+            b.setMatched(b == match);
+        }
+        boolean error = !idle && match == null;
+        numberBox.setState(typed.toString(), error);
+
+        int total = optionButtons.size() + (withBack ? 1 : 0);
+        String navy = "#1F2A44";
+        if (idle) {
+            hintMain.setForeground(Theme.TEXT_SECONDARY);
+            hintMain.setText("<html>Type an option number, then press <b style='color:" + navy + "'>Enter</b>."
+                    + (withBack ? " <b style='color:" + navy + "'>Backspace</b> goes back."
+                            : " Or click an option.") + "</html>");
+            hintSub.setText("");
+        } else if (error) {
+            hintMain.setForeground(Theme.ERR_FG);
+            hintMain.setText(rejected ? "<html><b>There is no option " + Integer.parseInt(typed.toString()) + ". Choose 1 to " + total + ".</b></html>"
+                    : "<html><b>✕ No option " + Integer.parseInt(typed.toString()) + ". Choose 1 to " + total + ".</b></html>");
+            hintSub.setText(rejected ? "Clears by itself in 2 seconds, or press Esc" : "Press Esc to clear");
+        } else {
+            hintMain.setForeground(Theme.TEXT_PRIMARY);
+            String name = match == backButton ? "Back" : labels.get(optionButtons.indexOf(match));
+            hintMain.setText("<html><b>" + (match == backButton ? "Enter to go back" : "Enter to open " + escape(name)) + "</b></html>");
+            hintSub.setText("Backspace deletes the digit · Esc clears");
+        }
+        hintMain.revalidate();
+    }
+
+    private static String escape(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;");
     }
 
     public void addController(ActionListener controller) {
-        for (JButton button : allButtons) {
+        for (MenuOptionButton button : allButtons) {
             button.addActionListener(controller);
         }
     }

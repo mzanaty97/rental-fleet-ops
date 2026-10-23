@@ -2,6 +2,10 @@ package com.rfo.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * A new car movement (NVM): adds a brand new vehicle to the fleet at a location (shown as
+ * yarded).
+ */
 public class NewCarMovement extends Movement {
 
     public static final Location INTAKE_DEPOT = new Location("AKLC99", "Auckland Intake Depot", null);

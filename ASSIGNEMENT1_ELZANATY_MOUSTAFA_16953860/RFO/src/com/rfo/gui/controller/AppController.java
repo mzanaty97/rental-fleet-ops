@@ -8,12 +8,15 @@ import com.rfo.service.AuthService;
 import com.rfo.service.DataStore;
 import com.rfo.service.LocationService;
 import com.rfo.service.MenuService;
+import com.rfo.service.MovementService;
 import com.rfo.service.StaffService;
 import com.rfo.service.VehicleService;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Controller for the main window. Opens a login tab when New Session is
  * pressed, turns it into a session tab after a successful login, sends it back
@@ -36,7 +39,8 @@ public class AppController implements ActionListener, LoginListener, SessionList
         this.staffService = staffService;
         this.dataStore = dataStore;
         this.menuService = new MenuService(staffService);
-        this.screenFactory = new ScreenFactory(new VehicleService(dataStore), new LocationService(dataStore));
+        this.screenFactory = new ScreenFactory(new VehicleService(dataStore), new LocationService(dataStore), staffService,
+                new MovementService(dataStore));
         window.getHomeView().addController(this);
     }
 
@@ -55,8 +59,12 @@ public class AppController implements ActionListener, LoginListener, SessionList
         new NavigationController(sessionView, menuService.getMenuFor(staff.getRole()), screenFactory, staff);
         dataStore.addListener(sessionView);
 
-        window.replaceTab(view, sessionView, staff.getFName() + " (" + staff.getStaffID() + ")",
-                ev -> closeTab(sessionView));
+        window.replaceTabWithSession(view, sessionView, staff, ev -> closeTab(sessionView));
+    }
+
+    @Override
+    public void onLoginLocked(LoginView view) {
+        window.markTabLocked(view);
     }
 
     // logging out does not close the tab, it goes back to the login form

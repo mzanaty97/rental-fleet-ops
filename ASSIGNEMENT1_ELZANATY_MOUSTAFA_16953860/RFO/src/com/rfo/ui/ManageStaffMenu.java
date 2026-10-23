@@ -8,6 +8,11 @@ import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
 
+// Generated with assistance from Claude (modified existing class): I wrote this menu in Part 1; Claude helped me change it to call the service classes and show their error messages.
+/**
+ * The console menu for viewing and adding staff and granting or revoking their location
+ * access.
+ */
 public class ManageStaffMenu extends Menu {
 
     private StaffService service;
@@ -84,14 +89,13 @@ public class ManageStaffMenu extends Menu {
             return;
         }
 
-        Staff newStaff = service.addStaff(staffID, password, fName, lName, role);
-
-        if (newStaff == null) {
+        try {
+            Staff newStaff = service.addStaff(staffID, password, fName, lName, role);
+            System.out.println("Staff added successfully: " + newStaff.getStaffID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             System.out.println("Failed to add staff. See message above.");
-            return;
         }
-
-        System.out.println("Staff added successfully: " + newStaff.getStaffID());
     }
 
     private void grantLocationAccess() {
@@ -110,7 +114,12 @@ public class ManageStaffMenu extends Menu {
             return;
         }
 
-        service.grantLocationAccess(target, location);
+        try {
+            service.grantLocationAccess(target, location);
+            System.out.println("Access granted.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void revokeLocationAccess() {
@@ -119,9 +128,11 @@ public class ManageStaffMenu extends Menu {
             return;
         }
 
-        boolean revoked = service.revokeAllLocationAccess(target);
-        if (revoked) {
+        try {
+            service.revokeAllLocationAccess(target);
             System.out.println("All location access revoked for: " + target.getStaffID());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 

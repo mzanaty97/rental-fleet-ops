@@ -6,6 +6,10 @@ import com.rfo.service.StaffService;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The console main menu. Opens the admin, movements, fleet, reports and location manager
+ * menus.
+ */
 public class MainMenu extends Menu {
 
     private StaffService service;

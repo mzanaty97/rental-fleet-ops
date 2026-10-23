@@ -3,6 +3,8 @@ package com.rfo.service;
 import com.rfo.model.StaffRole;
 import java.util.List;
 
+// Generated with assistance from Claude, at my direction
+// (I specified the requirements, layout and behaviour, and I reviewed and tested the code).
 /**
  * Builds the menu tree a staff role is allowed to see. It follows the same
  * menus as the console version, so the GUI and the CUI offer the same options

@@ -1,5 +1,8 @@
 package com.rfo.model;
 
+/**
+ * A postal address: street, city, country and postal code. Used by locations and drivers.
+ */
 public class Address {
 
     private String street;

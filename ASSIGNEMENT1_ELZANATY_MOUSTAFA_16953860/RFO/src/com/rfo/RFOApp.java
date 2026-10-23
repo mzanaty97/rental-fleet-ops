@@ -7,6 +7,10 @@ import com.rfo.ui.LoginMenu;
 import com.rfo.ui.MainMenu;
 import java.util.Scanner;
 
+/**
+ * Entry point of the console version of the app (Part 1). Logs a staff member in and
+ * opens the main menu. The GUI version starts from gui/RFOGuiApp.
+ */
 public class RFOApp {
 
     public static void main(String[] args) {

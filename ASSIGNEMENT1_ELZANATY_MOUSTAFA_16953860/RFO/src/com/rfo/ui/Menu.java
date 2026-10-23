@@ -5,6 +5,11 @@ import com.rfo.service.DataStore;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Base class for the console menus. Shows the title and the options and keeps asking
+ * until the user chooses to exit; each menu fills in its own options and what happens on
+ * each choice.
+ */
 public abstract class Menu {
 
     protected Scanner scanner;

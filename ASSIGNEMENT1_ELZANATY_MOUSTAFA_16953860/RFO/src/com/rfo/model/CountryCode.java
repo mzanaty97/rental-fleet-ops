@@ -1,5 +1,8 @@
 package com.rfo.model;
 
+/**
+ * Country codes, grouped by continent, used when entering an address.
+ */
 public enum CountryCode {
     // ===== Africa =====
     DZ, // Algeria

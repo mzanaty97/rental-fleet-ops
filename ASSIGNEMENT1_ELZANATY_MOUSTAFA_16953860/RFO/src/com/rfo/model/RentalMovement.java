@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A rental movement (ORA): a driven movement with an insurance tier, optional RSA and
+ * extra equipment. Works out the price from the number of days, the rates and the extras.
+ */
 public class RentalMovement extends DrivenMovement {
 
     private static final double RSA_DAILY_RATE = 9.0;
@@ -62,7 +66,7 @@ public class RentalMovement extends DrivenMovement {
         this.rsa = rsa;
     }
 
-    private int getDaysBetween(LocalDateTime start, LocalDateTime end) {
+    private static int getDaysBetween(LocalDateTime start, LocalDateTime end) {
         long hours = ChronoUnit.HOURS.between(start, end);
         int days = (int) (hours / 24);
         long remainder = hours % 24;
@@ -72,7 +76,7 @@ public class RentalMovement extends DrivenMovement {
         return Math.max(days, 1);
     }
 
-    private double getInsuranceBaseRate(int days) {
+    private static double getInsuranceBaseRate(int days) {
         if (days <= 3) {
             return 60.0;
         } else if (days <= 7) {
@@ -98,8 +102,69 @@ public class RentalMovement extends DrivenMovement {
         return insuranceCost + rsaCost;
     }
 
+    // Generated with assistance from Claude: holds a price worked out in parts (days, base, insurance, RSA, equipment, total).
+    /**
+     * A price worked out before the rental exists: the days, and what each part
+     * of the price comes to.
+     */
+    public static class Quote {
+
+        public final int days;
+        public final double base;
+        public final double insurance;
+        public final double rsa;
+        public final double equipment;
+        public final double total;
+
+        private Quote(int days, double base, double insurance, double rsa, double equipment) {
+            this.days = days;
+            this.base = base;
+            this.insurance = insurance;
+            this.rsa = rsa;
+            this.equipment = equipment;
+            this.total = base + insurance + rsa + equipment;
+        }
+    }
+
+    // Generated with assistance from Claude: prices a rental before it exists, using the same rules as the real estimate.
+    /**
+     * Prices a rental that has not started yet (no equipment), using the same
+     * rules as the real estimate.
+     */
+    public static Quote quote(Vehicle vehicle, LocalDateTime start, LocalDateTime end, boolean rsa, Insurance tier) {
+        int days = getDaysBetween(start, end);
+        double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
+        double insurance = getInsuranceBaseRate(days) * tier.getRate() * days;
+        double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
+        return new Quote(days, base, insurance, rsaCost, 0.0);
+    }
+
+    // Generated with assistance from Claude: breaks the final price into its parts so the invoice can show them.
+    /**
+     * What each part of the price came to once the rental was checked in (days,
+     * base, insurance, RSA, equipment). The total matches
+     * calculateRentalCost(). Used to write the invoice.
+     */
+    public Quote getFinalCharges() {
+        int days = getDaysBetween(checkOutDT, checkInDT);
+        double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
+        double insurance = getInsuranceBaseRate(days) * insuranceTier.getRate() * days;
+        double rsaCost = rsa ? RSA_DAILY_RATE * days : 0.0;
+        return new Quote(days, base, insurance, rsaCost, calculateEquipmentCost(days));
+    }
+
+    // Generated with assistance from Claude: (modified existing method) now delegates to estimateFor().
     public double getRentalEstimate() {
-        int days = getDaysBetween(checkOutDT, expectedCIDT);
+        return estimateFor(expectedCIDT);
+    }
+
+    // Generated with assistance from Claude: previews the price if the rental is returned at a given time (used by Amend Rental).
+    /**
+     * What the rental would cost if it were returned at the given time (used to
+     * preview an amendment).
+     */
+    public double estimateFor(LocalDateTime returnAt) {
+        int days = getDaysBetween(checkOutDT, returnAt);
         double base = vehicle.getRate() * Vehicle.getBaseDailyRate() * days;
         return base + calculateEquipmentCost(days) + calculateInsuranceCost(days);
     }

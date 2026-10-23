@@ -1,5 +1,9 @@
 package com.rfo.model;
 
+/**
+ * A customer who drives a rental vehicle. Implements Person, and each new driver gets the
+ * next driver ID automatically.
+ */
 public class Driver implements Person {
 
     private static int LATEST_DRIVER_ID;
